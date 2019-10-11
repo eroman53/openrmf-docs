@@ -1,0 +1,10 @@
+db = db.getSiblingDB('admin');
+db.createUser({ user: "openrmf" , pwd: "REDACTED", roles: ["readWriteAnyDatabase"]});
+db.createUser({ user: "openrmftemplate" , pwd: "REDACTED", roles: ["readWriteAnyDatabase"]});
+db.createUser({ user: "openrmfscore" , pwd: "REDACTED", roles: ["readWriteAnyDatabase"]});
+db = db.getSiblingDB('openrmf');
+db.createCollection("Artifacts");
+db = db.getSiblingDB('openrmftemplate');
+db.createCollection("Templates");
+db = db.getSiblingDB('openrmfscore');
+db.createCollection("Scores");
