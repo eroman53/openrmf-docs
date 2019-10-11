@@ -68,7 +68,7 @@ awsACM: arn:aws:acm:us-east-1:xxxxxxxxxxxxxx:certificate/xxxxxxxxxxxxxxxx
 checklistInitDBUser: root
 checklistInitDBPassword: REDACTED
 checklistInitDBName: openrmf
-checklistAppUser: root
+checklistAppUser: openrmf
 checklistAppPassword: REDACTED
 
 # Template Database Secret Values
@@ -79,8 +79,8 @@ templateAppUser: root
 templateAppPassword: REDACTED
 
 # Score Database Secret Values
-scoredbuser: root
-scoredbpassword: REDACTED
-scoredbname: openrmfscore
-scoreAppUser: root
+scoreInitDBUser: root
+scoreInitDBPassword: REDACTED
+scoreInitDBName: openrmfscore
+scoreAppUser: openrmfscore
 scoreAppPassword: REDACTED
