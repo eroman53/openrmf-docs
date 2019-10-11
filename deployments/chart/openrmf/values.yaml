@@ -75,7 +75,7 @@ checklistAppPassword: REDACTED
 templateInitDBUuser: root
 templateInitDBPassword: REDACTED
 templateInitDBName: openrmftemplate
-templateAppUser: root
+templateAppUser: openrmf
 templateAppPassword: REDACTED
 
 # Score Database Secret Values
