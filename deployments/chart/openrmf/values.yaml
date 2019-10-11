@@ -66,21 +66,21 @@ awsACM: arn:aws:acm:us-east-1:xxxxxxxxxxxxxx:certificate/xxxxxxxxxxxxxxxx
 
 # Checklist Database Secret Values
 checklistInitDBUser: root
-checklistInitDBPassword: REDACTED
+checklistInitDBPassword: mYp2ssw0rd
 checklistInitDBName: openrmf
-checklistAppUser: openrmf
+checklistAppUser: openrmf2
 checklistAppPassword: REDACTED
 
 # Template Database Secret Values
 templateInitDBUuser: root
-templateInitDBPassword: REDACTED
+templateInitDBPassword: myp2SSw0rd
 templateInitDBName: openrmftemplate
-templateAppUser: openrmf
-templateAppPassword: REDACTED
+templateAppUser: openrmftemplate2
+templateAppPassword: openrmf4321!
 
 # Score Database Secret Values
 scoreInitDBUser: root
-scoreInitDBPassword: REDACTED
+scoreInitDBPassword: REDACTED!
 scoreInitDBName: openrmfscore
-scoreAppUser: openrmfscore
-scoreAppPassword: REDACTED
+scoreAppUser: openrmfscore2
+scoreAppPassword: openrmf9999!
