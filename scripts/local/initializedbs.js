@@ -4,6 +4,7 @@ db.createUser({ user: "openrmftemplate" , pwd: "REDACTED", roles: ["readWriteAny
 db.createUser({ user: "openrmfscore" , pwd: "REDACTED", roles: ["readWriteAnyDatabase"]});
 db = db.getSiblingDB('openrmf');
 db.createCollection("Artifacts");
+db.createCollection("SystemGroups");
 db = db.getSiblingDB('openrmftemplate');
 db.createCollection("Templates");
 db = db.getSiblingDB('openrmfscore');
