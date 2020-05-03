@@ -3,6 +3,7 @@ db.createUser({ user: "openrmf" , pwd: "REDACTED", roles: ["readWriteAnyDatabase
 db.createUser({ user: "openrmftemplate" , pwd: "REDACTED", roles: ["readWriteAnyDatabase"]});
 db.createUser({ user: "openrmfscore" , pwd: "REDACTED", roles: ["readWriteAnyDatabase"]});
 db.createUser({ user: "openrmfaudit" , pwd: "REDACTED", roles: ["readWriteAnyDatabase"]});
+db.createUser({ user: "openrmfreport" , pwd: "REDACTED", roles: ["readWriteAnyDatabase"]});
 db = db.getSiblingDB('openrmf');
 db.createCollection("Artifacts");
 db.Artifacts.createIndex({ systemGroupId: 1 })
@@ -29,6 +30,7 @@ db.Audits.createIndex({ created: -1 })
 db.Audits.createIndex({ username: 1 })
 db.Audits.createIndex({ program: 1 })
 db.Audits.createIndex({ action: 1 })
+db = db.getSiblingDB('openrmfreport');
 db.createCollection("ACASScanReport");
 db.ACASScanReport.createIndex({ reportName: 1 })
 db.ACASScanReport.createIndex({ hostname: 1 })
