@@ -1,6 +1,10 @@
 db.createUser({ user: "openrmftemplate" , pwd: "REDACTED", roles: [{ "role": "readWrite", "db": "openrmftemplate"}]});
 db.createCollection("Templates");
-db.Templates.createIndex({ stigType: 1 })
-db.Templates.createIndex({ templateType: 1 })
-db.Templates.createIndex({ stigRelease: 1 })
-db.Templates.createIndex({ version: 1 })
+db.Templates.createIndex({ stigType: 1 });
+db.Templates.createIndex({ templateType: 1 });
+db.Templates.createIndex({ stigRelease: 1 });
+db.Templates.createIndex({ version: 1 });
+db.Templates.createIndex({ created: -1 });
+db.Templates.createIndex({ updatedOn: -1 });
+db.Templates.createIndex({ stigId: 1 });
+db.Templates.createIndex({ title: 1 });
