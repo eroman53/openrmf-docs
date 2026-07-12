@@ -113,7 +113,9 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, OPTIONS"
-    nginx.ingress.kubernetes.io/proxy-body-size: 5m
+    # raised from 5m -- this ingress carries the Nessus scan upload/save/download path
+    # (saveAPI/uploadAPI both route through /api/read/), target is 200MB+ scan files
+    nginx.ingress.kubernetes.io/proxy-body-size: 500m
 spec:
   rules:
   - host: {{.Values.dnsName}}
