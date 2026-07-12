@@ -4,6 +4,7 @@ db.createUser({ user: "openrmftemplate" , pwd: "openrmf1234!", roles: ["readWrit
 db.createUser({ user: "openrmfscore" , pwd: "openrmf1234!", roles: ["readWriteAnyDatabase"]});
 db.createUser({ user: "openrmfaudit" , pwd: "openrmf1234!", roles: ["readWriteAnyDatabase"]});
 db.createUser({ user: "openrmfreport" , pwd: "openrmf1234!", roles: ["readWriteAnyDatabase"]});
+db.createUser({ user: "openrmfscanhistory" , pwd: "openrmf1234!", roles: ["readWriteAnyDatabase"]});
 db = db.getSiblingDB('openrmf');
 db.createCollection("Artifacts");
 db.Artifacts.createIndex({ systemGroupId: 1 })
@@ -81,3 +82,7 @@ db.VulnerabilityReport.createIndex({ severityOverride: 1 })
 db.VulnerabilityReport.createIndex({ systemGroupId: 1 })
 db.VulnerabilityReport.createIndex({ artifactId: 1 })
 db.VulnerabilityReport.createIndex({ severity: 1 })
+db = db.getSiblingDB('openrmfscanhistory');
+db.createCollection("ScanFiles");
+db.ScanFiles.createIndex({ systemGroupId: 1, scanType: 1, isLatest: 1 });
+db.ScanFiles.createIndex({ created: -1 });
