@@ -5,6 +5,7 @@ db.createUser({ user: "openrmfscore" , pwd: "openrmf1234!", roles: ["readWriteAn
 db.createUser({ user: "openrmfaudit" , pwd: "openrmf1234!", roles: ["readWriteAnyDatabase"]});
 db.createUser({ user: "openrmfreport" , pwd: "openrmf1234!", roles: ["readWriteAnyDatabase"]});
 db.createUser({ user: "openrmfscanhistory" , pwd: "openrmf1234!", roles: ["readWriteAnyDatabase"]});
+db.createUser({ user: "openrmfpoam" , pwd: "openrmf1234!", roles: ["readWriteAnyDatabase"]});
 db = db.getSiblingDB('openrmf');
 db.createCollection("Artifacts");
 db.Artifacts.createIndex({ systemGroupId: 1 })
@@ -86,3 +87,12 @@ db = db.getSiblingDB('openrmfscanhistory');
 db.createCollection("ScanFiles");
 db.ScanFiles.createIndex({ systemGroupId: 1, scanType: 1, isLatest: 1 });
 db.ScanFiles.createIndex({ created: -1 });
+db.createCollection("Findings");
+db.Findings.createIndex({ systemGroupId: 1, scanType: 1, status: 1 });
+db.Findings.createIndex({ systemGroupId: 1, scanType: 1, hostname: 1, pluginId: 1 });
+db = db.getSiblingDB('openrmfpoam');
+db.createCollection("Poams");
+db.Poams.createIndex({ systemGroupId: 1, sourceType: 1, sourceKey: 1 });
+db.Poams.createIndex({ systemGroupId: 1, status: 1 });
+db.Poams.createIndex({ artifactId: 1 });
+db.Poams.createIndex({ created: -1 });
