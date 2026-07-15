@@ -125,6 +125,25 @@ services:
     networks:
       - openrmf
 
+  openrmfapi-journal:
+    image: eroman53/openrmf-api-journal:latest
+    container_name: openrmf-journal-api
+    restart: on-failure:5
+    ports:
+      - "8104"
+    env_file: .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://*:8104
+      - DBCONNECTION=mongodb://openrmfjournal:openrmf1234!@journaldb/openrmfjournal?authSource=openrmfjournal
+      - DB=openrmfjournal
+      - DBTYPE=mongo
+      - LOGLEVEL=3
+    depends_on:
+      - journaldb
+    networks:
+      - openrmf
+
   openrmfapi-controls:
     image: docker.io/cingulara/openrmf-api-controls:1.14.02
     container_name: openrmf-controls-api
@@ -313,6 +332,24 @@ services:
     networks:
       - openrmf
 
+  openrmfmsg-journal:
+    image: eroman53/openrmf-msg-journal:latest
+    container_name: openrmf-journal-nats-message-client
+    restart: on-failure:5
+    environment:
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDB=openrmf
+      - JOURNALDBCONNECTION=mongodb://openrmfjournal:openrmf1234!@journaldb/openrmfjournal?authSource=openrmfjournal
+      - JOURNALDB=openrmfjournal
+      - NATSSERVERURL=nats://natsserver:4222
+      - LOGLEVEL=3
+    depends_on:
+      - checklistdb
+      - journaldb
+      - natsserver
+    networks:
+      - openrmf
+
 ### 5 MongoDB Containers
   checklistdb:
     image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
@@ -423,6 +460,22 @@ services:
     volumes:
       - poam-data-volume:/data/db
       - ./initializePoam.js:/docker-entrypoint-initdb.d/initialize.js:Z
+    networks:
+      - openrmf
+
+  journaldb:
+    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
+    container_name: mongodb-journal
+    restart: on-failure:5
+    ports:
+      - "27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
+      - MONGO_INITDB_DATABASE=openrmfjournal
+    volumes:
+      - journal-data-volume:/data/db
+      - ./initializeJournal.js:/docker-entrypoint-initdb.d/initialize.js:Z
     networks:
       - openrmf
 
@@ -560,6 +613,7 @@ volumes:
   report-data-volume:
   scanhistory-data-volume:
   poam-data-volume:
+  journal-data-volume:
   openrmf-prometheus-data-volume:
   openrmf-grafana-data-volume:
   keycloak-postgres16:
