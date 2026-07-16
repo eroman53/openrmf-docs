@@ -336,11 +336,14 @@ services:
     image: eroman53/openrmf-svc-scanwatch:latest
     container_name: openrmf-scanwatch
     restart: on-failure:5
+    ports:
+      - "8106"
+    env_file: .env
     environment:
-      - WATCHROOT=/scans
-      - POLLSECONDS=${SCANWATCH_POLLSECONDS:-300}
-      - STABLESECONDS=${SCANWATCH_STABLESECONDS:-60}
-      - AUTOCREATESYSTEMS=${SCANWATCH_AUTOCREATE:-false}
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://*:8106
+      # the SMB share location and read-only credentials are configured in the
+      # web UI (Admin > Scan Watch), stored in this service's own DB -- not here
       - OPENRMFAPIURL=http://openrmfapi-read:8084
       - KEYCLOAKTOKENURL=http://openrmf-keycloak:8080/auth/realms/openrmf/protocol/openid-connect/token
       - CLIENTID=openrmf-scanwatch
@@ -348,10 +351,6 @@ services:
       - DBCONNECTION=mongodb://openrmfscanwatch:openrmf1234!@scanwatchdb/openrmfscanwatch?authSource=openrmfscanwatch
       - DB=openrmfscanwatch
       - LOGLEVEL=2
-    volumes:
-      # back this with the CIFS-mounted scc-scans volume below (SMB share), or
-      # point SCANWATCH_SOURCE at a host path for local testing
-      - ${SCANWATCH_SOURCE:-scc-scans}:/scans:ro
     depends_on:
       - scanwatchdb
       - openrmfapi-read
@@ -657,15 +656,6 @@ volumes:
   poam-data-volume:
   journal-data-volume:
   scanwatch-data-volume:
-  # the SCC scan drop share (SMB). Set SCANWATCH_SHARE/_USER/_PASS in .env;
-  # for local testing set SCANWATCH_SOURCE to a host directory instead and
-  # this volume is never mounted.
-  scc-scans:
-    driver: local
-    driver_opts:
-      type: cifs
-      device: ${SCANWATCH_SHARE:-//fileserver/scc-drops}
-      o: "username=${SCANWATCH_SHARE_USER:-changeme},password=${SCANWATCH_SHARE_PASS:-changeme},ro,vers=3.0"
   openrmf-prometheus-data-volume:
   openrmf-grafana-data-volume:
   keycloak-postgres16:
