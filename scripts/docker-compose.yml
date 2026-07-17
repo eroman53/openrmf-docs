@@ -332,6 +332,25 @@ services:
     networks:
       - openrmf
 
+  openrmfapi-tasks:
+    image: eroman53/openrmf-api-tasks:latest
+    container_name: openrmf-tasks-api
+    restart: on-failure:5
+    ports:
+      - "8112"
+    env_file: .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://*:8112
+      - DBCONNECTION=mongodb://openrmftasks:openrmf1234!@tasksdb/openrmftasks?authSource=openrmftasks
+      - DB=openrmftasks
+      - DBTYPE=mongo
+      - LOGLEVEL=3
+    depends_on:
+      - tasksdb
+    networks:
+      - openrmf
+
   openrmfapi-inventory:
     image: eroman53/openrmf-api-inventory:latest
     container_name: openrmf-inventory-api
@@ -567,6 +586,22 @@ services:
     networks:
       - openrmf
 
+  tasksdb:
+    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
+    container_name: mongodb-tasks
+    restart: on-failure:5
+    ports:
+      - "27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
+      - MONGO_INITDB_DATABASE=openrmftasks
+    volumes:
+      - tasks-data-volume:/data/db
+      - ./initializeTasks.js:/docker-entrypoint-initdb.d/initialize.js:Z
+    networks:
+      - openrmf
+
   inventorydb:
     image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
     container_name: mongodb-inventory
@@ -769,6 +804,7 @@ volumes:
   scanwatch-data-volume:
   conmon-data-volume:
   inventory-data-volume:
+  tasks-data-volume:
   openrmf-prometheus-data-volume:
   openrmf-grafana-data-volume:
   keycloak-postgres16:
