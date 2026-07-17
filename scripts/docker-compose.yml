@@ -332,6 +332,32 @@ services:
     networks:
       - openrmf
 
+  openrmfapi-inventory:
+    image: eroman53/openrmf-api-inventory:latest
+    container_name: openrmf-inventory-api
+    restart: on-failure:5
+    ports:
+      - "8110"
+    env_file: .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://*:8110
+      - DBCONNECTION=mongodb://openrmfinventory:openrmf1234!@inventorydb/openrmfinventory?authSource=openrmfinventory
+      - DB=openrmfinventory
+      - DBTYPE=mongo
+      # read-only cross-service views for reconciliation and fleet findings
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDB=openrmf
+      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@scanhistorydb/openrmfscanhistory?authSource=openrmfscanhistory
+      - SCANHISTORYDB=openrmfscanhistory
+      - LOGLEVEL=3
+    depends_on:
+      - inventorydb
+      - checklistdb
+      - scanhistorydb
+    networks:
+      - openrmf
+
   openrmfapi-conmon:
     image: eroman53/openrmf-api-conmon:latest
     container_name: openrmf-conmon-api
@@ -386,6 +412,27 @@ services:
     depends_on:
       - scanwatchdb
       - openrmfapi-read
+    networks:
+      - openrmf
+
+  openrmfmsg-inventory:
+    image: eroman53/openrmf-msg-inventory:latest
+    container_name: openrmf-inventory-nats-message-client
+    restart: on-failure:5
+    environment:
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDB=openrmf
+      - INVENTORYDBCONNECTION=mongodb://openrmfinventory:openrmf1234!@inventorydb/openrmfinventory?authSource=openrmfinventory
+      - INVENTORYDB=openrmfinventory
+      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@scanhistorydb/openrmfscanhistory?authSource=openrmfscanhistory
+      - SCANHISTORYDB=openrmfscanhistory
+      - NATSSERVERURL=nats://natsserver:4222
+      - LOGLEVEL=2
+    depends_on:
+      - checklistdb
+      - inventorydb
+      - scanhistorydb
+      - natsserver
     networks:
       - openrmf
 
@@ -517,6 +564,22 @@ services:
     volumes:
       - poam-data-volume:/data/db
       - ./initializePoam.js:/docker-entrypoint-initdb.d/initialize.js:Z
+    networks:
+      - openrmf
+
+  inventorydb:
+    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
+    container_name: mongodb-inventory
+    restart: on-failure:5
+    ports:
+      - "27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
+      - MONGO_INITDB_DATABASE=openrmfinventory
+    volumes:
+      - inventory-data-volume:/data/db
+      - ./initializeInventory.js:/docker-entrypoint-initdb.d/initialize.js:Z
     networks:
       - openrmf
 
@@ -705,6 +768,7 @@ volumes:
   journal-data-volume:
   scanwatch-data-volume:
   conmon-data-volume:
+  inventory-data-volume:
   openrmf-prometheus-data-volume:
   openrmf-grafana-data-volume:
   keycloak-postgres16:
