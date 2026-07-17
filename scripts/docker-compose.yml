@@ -332,6 +332,38 @@ services:
     networks:
       - openrmf
 
+  openrmfapi-conmon:
+    image: eroman53/openrmf-api-conmon:latest
+    container_name: openrmf-conmon-api
+    restart: on-failure:5
+    ports:
+      - "8108"
+    env_file: .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://*:8108
+      - DBCONNECTION=mongodb://openrmfconmon:openrmf1234!@conmondb/openrmfconmon?authSource=openrmfconmon
+      - DB=openrmfconmon
+      - DBTYPE=mongo
+      # read-only cross-service views for posture computation
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDB=openrmf
+      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@scanhistorydb/openrmfscanhistory?authSource=openrmfscanhistory
+      - SCANHISTORYDB=openrmfscanhistory
+      - POAMDBCONNECTION=mongodb://openrmfpoam:openrmf1234!@poamdb/openrmfpoam?authSource=openrmfpoam
+      - POAMDB=openrmfpoam
+      - TEMPLATEDBCONNECTION=mongodb://openrmftemplate:openrmf1234!@templatedb/openrmftemplate?authSource=openrmftemplate
+      - TEMPLATEDB=openrmftemplate
+      - LOGLEVEL=3
+    depends_on:
+      - conmondb
+      - checklistdb
+      - scanhistorydb
+      - poamdb
+      - templatedb
+    networks:
+      - openrmf
+
   openrmfsvc-scanwatch:
     image: eroman53/openrmf-svc-scanwatch:latest
     container_name: openrmf-scanwatch
@@ -485,6 +517,22 @@ services:
     volumes:
       - poam-data-volume:/data/db
       - ./initializePoam.js:/docker-entrypoint-initdb.d/initialize.js:Z
+    networks:
+      - openrmf
+
+  conmondb:
+    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
+    container_name: mongodb-conmon
+    restart: on-failure:5
+    ports:
+      - "27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
+      - MONGO_INITDB_DATABASE=openrmfconmon
+    volumes:
+      - conmon-data-volume:/data/db
+      - ./initializeConmon.js:/docker-entrypoint-initdb.d/initialize.js:Z
     networks:
       - openrmf
 
@@ -656,6 +704,7 @@ volumes:
   poam-data-volume:
   journal-data-volume:
   scanwatch-data-volume:
+  conmon-data-volume:
   openrmf-prometheus-data-volume:
   openrmf-grafana-data-volume:
   keycloak-postgres16:
