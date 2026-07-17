@@ -350,7 +350,11 @@ services:
       - CLIENTSECRET=${SCANWATCH_CLIENTSECRET}
       - LOGLEVEL=2
     volumes:
-      # the folder tree Trivy scans; point TRIVYSCAN_TARGET at a host path
+      # the folder tree Trivy scans. TRIVYSCAN_TARGET picks the source:
+      #   - a host path for local content, or
+      #   - "trivyscan-nfs" to use the NFS export defined below
+      #     (set TRIVYSCAN_NFS_SERVER + TRIVYSCAN_NFS_PATH in .env)
+      # the UI's folder picker traverses whatever is mounted here
       - ${TRIVYSCAN_TARGET:-trivyscan-target-volume}:/target:ro
       # persists the ~60MB Trivy vulnerability DB across container recreation
       - trivyscan-cache-volume:/app/.trivycache
@@ -852,6 +856,16 @@ volumes:
   trivyscan-data-volume:
   trivyscan-cache-volume:
   trivyscan-target-volume:
+  # NFS-backed scan target: the Docker host kernel mounts the export (no
+  # privileged container needed). Set TRIVYSCAN_TARGET=trivyscan-nfs plus
+  # TRIVYSCAN_NFS_SERVER (host/IP) and TRIVYSCAN_NFS_PATH (export path) in
+  # .env. The volume only mounts when the scanner container references it.
+  trivyscan-nfs:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: "addr=${TRIVYSCAN_NFS_SERVER:-nfs-server.example.mil},ro,soft,nolock,vers=${TRIVYSCAN_NFS_VERS:-4}"
+      device: ":${TRIVYSCAN_NFS_PATH:-/exports/scans}"
   openrmf-prometheus-data-volume:
   openrmf-grafana-data-volume:
   keycloak-postgres16:
