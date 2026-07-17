@@ -332,6 +332,34 @@ services:
     networks:
       - openrmf
 
+  openrmfsvc-trivy:
+    image: eroman53/openrmf-svc-trivy:latest
+    container_name: openrmf-trivy-scanner
+    restart: on-failure:5
+    ports:
+      - "8114"
+    env_file: .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://*:8114
+      - DBCONNECTION=mongodb://openrmftrivyscan:openrmf1234!@trivyscandb/openrmftrivyscan?authSource=openrmftrivyscan
+      - DB=openrmftrivyscan
+      - SCANHISTORYAPIURL=http://openrmfapi-scanhistory:8100
+      - KEYCLOAKTOKENURL=http://openrmf-keycloak:8080/auth/realms/openrmf/protocol/openid-connect/token
+      - CLIENTID=openrmf-scanwatch
+      - CLIENTSECRET=${SCANWATCH_CLIENTSECRET}
+      - LOGLEVEL=2
+    volumes:
+      # the folder tree Trivy scans; point TRIVYSCAN_TARGET at a host path
+      - ${TRIVYSCAN_TARGET:-trivyscan-target-volume}:/target:ro
+      # persists the ~60MB Trivy vulnerability DB across container recreation
+      - trivyscan-cache-volume:/app/.trivycache
+    depends_on:
+      - trivyscandb
+      - openrmfapi-scanhistory
+    networks:
+      - openrmf
+
   openrmfapi-tasks:
     image: eroman53/openrmf-api-tasks:latest
     container_name: openrmf-tasks-api
@@ -586,6 +614,22 @@ services:
     networks:
       - openrmf
 
+  trivyscandb:
+    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
+    container_name: mongodb-trivyscan
+    restart: on-failure:5
+    ports:
+      - "27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
+      - MONGO_INITDB_DATABASE=openrmftrivyscan
+    volumes:
+      - trivyscan-data-volume:/data/db
+      - ./initializeTrivyscan.js:/docker-entrypoint-initdb.d/initialize.js:Z
+    networks:
+      - openrmf
+
   tasksdb:
     image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
     container_name: mongodb-tasks
@@ -805,6 +849,9 @@ volumes:
   conmon-data-volume:
   inventory-data-volume:
   tasks-data-volume:
+  trivyscan-data-volume:
+  trivyscan-cache-volume:
+  trivyscan-target-volume:
   openrmf-prometheus-data-volume:
   openrmf-grafana-data-volume:
   keycloak-postgres16:
