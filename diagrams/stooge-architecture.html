@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  @media print { @page { size: 1660px 4600px; margin: 14px; } body { padding: 20px 24px; } }
+  .frame { max-width: 1600px !important; }
+  .scroller { overflow: visible !important; }
+  .scroller svg { min-width: 1560px !important; }
+</style>
+</head>
+<body>
+<title>STOOGE — Architecture & Ports/Protocols</title>
+<style>
+  :root {
+    --bg: #F4F7F6; --panel: #FFFFFF; --ink: #1C262E; --muted: #5C6B76;
+    --line: #93A3AE; --faint: #C6D0D7; --accent: #0F766E; --accent-ink: #0B5D57;
+    --accent-tint: rgba(15,118,110,.09); --ext: #B45309; --ext-tint: rgba(180,83,9,.08);
+    --bus: #4A5BC4; --bus-tint: rgba(74,91,196,.10); --chip: #E8EDEB;
+    --brand: #d63a22;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0F161B; --panel: #17222A; --ink: #E2EAEF; --muted: #93A5B1;
+      --line: #51616D; --faint: #33424C; --accent: #2FB9A9; --accent-ink: #4FD0C0;
+      --accent-tint: rgba(47,185,169,.13); --ext: #E2A15C; --ext-tint: rgba(226,161,92,.12);
+      --bus: #8E9DEE; --bus-tint: rgba(142,157,238,.14); --chip: #223039; --brand: #e05a44;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F161B; --panel: #17222A; --ink: #E2EAEF; --muted: #93A5B1;
+    --line: #51616D; --faint: #33424C; --accent: #2FB9A9; --accent-ink: #4FD0C0;
+    --accent-tint: rgba(47,185,169,.13); --ext: #E2A15C; --ext-tint: rgba(226,161,92,.12);
+    --bus: #8E9DEE; --bus-tint: rgba(142,157,238,.14); --chip: #223039; --brand: #e05a44;
+  }
+  :root[data-theme="light"] {
+    --bg: #F4F7F6; --panel: #FFFFFF; --ink: #1C262E; --muted: #5C6B76;
+    --line: #93A3AE; --faint: #C6D0D7; --accent: #0F766E; --accent-ink: #0B5D57;
+    --accent-tint: rgba(15,118,110,.09); --ext: #B45309; --ext-tint: rgba(180,83,9,.08);
+    --bus: #4A5BC4; --bus-tint: rgba(74,91,196,.10); --chip: #E8EDEB; --brand: #d63a22;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    margin: 0; padding: 32px 28px 64px; font-size: 15px; line-height: 1.55;
+  }
+  .mono { font-family: "Cascadia Code", Consolas, ui-monospace, monospace; }
+
+  header { max-width: 1180px; margin: 0 auto 20px; }
+  .eyebrow {
+    font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px;
+    font-family: "Cascadia Code", Consolas, ui-monospace, monospace;
+  }
+  .eyebrow b { color: var(--brand); }
+  h1 { font-size: 30px; font-weight: 650; letter-spacing: -.015em; margin: 0 0 8px; text-wrap: balance; }
+  .lede { color: var(--muted); max-width: 70ch; margin: 0 0 14px; }
+  .counts { display: flex; flex-wrap: wrap; gap: 8px; }
+  .counts span { background: var(--chip); border-radius: 4px; padding: 3px 10px; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  .counts b { font-weight: 650; }
+
+  h2 { font-size: 19px; font-weight: 650; letter-spacing: -.01em; margin: 34px 0 10px; max-width: 1180px; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+
+  .legend { max-width: 1180px; margin: 0 auto 14px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center; font-size: 12.5px; color: var(--muted); }
+  .legend .grp { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .legend .item { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+  .sw.upstream { background: var(--panel); border: 1.5px solid var(--line); }
+  .sw.modified { background: var(--panel); border: 2px solid var(--accent); }
+  .sw.forknew { background: var(--accent-tint); border: 1.5px solid var(--accent); }
+  .sw.external { background: var(--ext-tint); border: 1.5px solid var(--ext); }
+  .legend svg { display: block; }
+  .legend .divider { width: 1px; height: 18px; background: var(--faint); }
+
+  .frame { max-width: 1180px; margin: 0 auto; background: var(--panel); border: 1px solid var(--faint); border-radius: 10px; padding: 10px 6px 4px; }
+  .scroller { overflow-x: auto; }
+  .scroller svg { display: block; min-width: 1200px; }
+  .hint { font-size: 11.5px; color: var(--muted); text-align: right; padding: 4px 12px 8px; }
+
+  svg text { font-family: "Segoe UI", system-ui, sans-serif; fill: var(--ink); }
+  .t { font-size: 12.5px; font-weight: 650; }
+  .ts { font-size: 12px; font-weight: 650; }
+  .sub { font-size: 10.5px; fill: var(--muted); font-weight: 400; }
+  .tag { font-size: 10px; fill: var(--muted); font-family: "Cascadia Code", Consolas, ui-monospace, monospace; }
+  .elabel { font-size: 10px; fill: var(--muted); }
+  .elabel.acc { fill: var(--accent-ink); }
+  .elabel.extc { fill: var(--ext); font-weight: 600; }
+  .elabel.busc { fill: var(--bus); }
+  .t.acc, .ts.acc { fill: var(--accent-ink); }
+  .ts.extc { fill: var(--ext); }
+  .ts.mutedt { fill: var(--muted); }
+
+  .node { fill: var(--panel); stroke: var(--line); stroke-width: 1.4; rx: 7; }
+  .node.mod { stroke: var(--accent); stroke-width: 2; }
+  .node.new { fill: var(--accent-tint); stroke: var(--accent); stroke-width: 1.6; }
+  .node.ext { fill: var(--ext-tint); stroke: var(--ext); stroke-width: 1.5; }
+  .cluster { fill: none; stroke: var(--faint); stroke-width: 1.3; stroke-dasharray: 5 4; rx: 9; }
+  .band { fill: var(--bus-tint); stroke: var(--bus); stroke-width: 1.4; rx: 7; }
+  .databand { fill: var(--chip); stroke: var(--line); stroke-width: 1.2; rx: 7; }
+  .bandtext { font-size: 12.5px; font-weight: 650; fill: var(--bus); }
+  .bandsub { font-size: 10.5px; fill: var(--bus); opacity: .85; font-family: "Cascadia Code", Consolas, ui-monospace, monospace; }
+
+  .http { stroke: var(--line); stroke-width: 1.4; fill: none; }
+  .http.hi { stroke: var(--ink); stroke-width: 1.6; }
+  .rail { stroke: var(--line); stroke-width: 1.2; fill: none; opacity: .75; }
+  .nats { stroke: var(--bus); stroke-width: 1.5; stroke-dasharray: 6 4; fill: none; }
+  .mongo { stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 2 3; fill: none; }
+  .mongo.acc { stroke: var(--accent); }
+  .smb { stroke: var(--ext); stroke-width: 2.4; fill: none; }
+  .mk-http { fill: var(--line); } .mk-ink { fill: var(--ink); }
+  .mk-nats { fill: var(--bus); } .mk-mongo { fill: var(--muted); }
+  .mk-macc { fill: var(--accent); } .mk-smb { fill: var(--ext); }
+
+  /* ports section */
+  .boundary { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; max-width: 1180px; margin: 0 auto 18px; }
+  @media (max-width: 860px) { .boundary { grid-template-columns: 1fr; } }
+  .bcard { background: var(--panel); border: 1px solid var(--faint); border-radius: 8px; padding: 14px 16px; }
+  .bcard h3 { margin: 0 0 6px; font-size: 13px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; }
+  .bcard.inb h3 { color: var(--accent-ink); } .bcard.outb h3 { color: var(--ext); } .bcard.internal h3 { color: var(--muted); }
+  .bcard p { margin: 0; font-size: 13.5px; color: var(--muted); }
+  .bcard .big { font-size: 22px; font-weight: 650; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  .tablewrap { max-width: 1180px; margin: 0 auto; background: var(--panel); border: 1px solid var(--faint); border-radius: 10px; overflow-x: auto; }
+  table.ppsm { border-collapse: collapse; width: 100%; min-width: 900px; font-size: 13px; }
+  .ppsm th, .ppsm td { padding: 7px 12px; text-align: left; border-bottom: 1px solid var(--faint); vertical-align: top; }
+  .ppsm thead th { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); border-bottom: 1.5px solid var(--line); }
+  .ppsm td.mono, .ppsm .mono { font-family: "Cascadia Code", Consolas, ui-monospace, monospace; font-size: 12.5px; white-space: nowrap; }
+  .ppsm tr.grp td { background: var(--chip); font-weight: 650; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink); }
+  .ppsm .dir { font-size: 11px; border-radius: 3px; padding: 1px 7px; white-space: nowrap; }
+  .dir.in { background: var(--accent-tint); color: var(--accent-ink); border: 1px solid var(--accent); }
+  .dir.out { background: var(--ext-tint); color: var(--ext); border: 1px solid var(--ext); }
+  .dir.int { background: var(--chip); color: var(--muted); border: 1px solid var(--faint); }
+  footer { max-width: 1180px; margin: 30px auto 0; font-size: 12px; color: var(--muted); border-top: 1px solid var(--faint); padding-top: 12px; }
+</style>
+
+<header>
+  <div class="eyebrow"><b>stooge</b> · stig tracking, oversight, and organizational governance engine · eroman53 openrmf fork · july 2026</div>
+  <h1>Architecture &amp; Communication Ports / Protocols</h1>
+  <p class="lede">Every box is a container on the internal <span class="mono">openrmf</span> Docker network. NGINX is the single
+    host-exposed entry point; the NATS bus is the service backbone; every service owns exactly one MongoDB. All fork-built
+    .NET services now run on the <b>UBI8 (RHEL&nbsp;8.10) base</b> with the DoD CA bundle. Teal marks fork additions/modifications.</p>
+  <div class="counts">
+    <span><b>46</b> containers</span>
+    <span><b>15</b> HTTP services</span>
+    <span><b>10</b> NATS listeners</span>
+    <span><b>13</b> Mongo DBs</span>
+    <span><b>1</b> host-exposed port (8080)</span>
+    <span>UBI8 fork services</span>
+  </div>
+</header>
+
+<h2 class="wrap">1 · Container architecture</h2>
+<div class="legend">
+  <div class="grp">
+    <span class="item"><span class="sw upstream"></span> upstream (Alpine)</span>
+    <span class="item"><span class="sw modified"></span> fork-modified (UBI8)</span>
+    <span class="item"><span class="sw forknew"></span> fork-new (UBI8)</span>
+    <span class="item"><span class="sw external"></span> external</span>
+  </div>
+  <div class="divider"></div>
+  <div class="grp">
+    <span class="item"><svg width="30" height="10"><line x1="1" y1="5" x2="29" y2="5" class="http"/></svg> HTTP / REST</span>
+    <span class="item"><svg width="30" height="10"><line x1="1" y1="5" x2="29" y2="5" class="nats"/></svg> NATS pub/sub</span>
+    <span class="item"><svg width="30" height="10"><line x1="1" y1="5" x2="29" y2="5" class="mongo"/></svg> MongoDB</span>
+    <span class="item"><svg width="30" height="10"><line x1="1" y1="5" x2="29" y2="5" class="smb"/></svg> SMB / NFS / registry (boundary)</span>
+  </div>
+</div>
+
+<div class="frame">
+<div class="scroller">
+<svg viewBox="0 0 1560 940" width="1560" height="940" role="img" aria-label="STOOGE container architecture diagram">
+  <defs>
+    <marker id="ahttp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-http"/></marker>
+    <marker id="aink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-ink"/></marker>
+    <marker id="anats" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-nats"/></marker>
+    <marker id="amongo" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-mongo"/></marker>
+    <marker id="amacc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-macc"/></marker>
+    <marker id="asmb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-smb"/></marker>
+  </defs>
+
+  <!-- ======== EDGES ======== -->
+  <!-- browser -> nginx -->
+  <line x1="200" y1="80" x2="200" y2="146" class="http hi" marker-end="url(#aink)"/>
+  <text x="210" y="118" class="elabel">HTTPS :8080</text>
+
+  <!-- nginx -> keycloak, keycloak -> postgres -->
+  <line x1="620" y1="181" x2="676" y2="181" class="http" marker-end="url(#ahttp)"/>
+  <text x="624" y="172" class="elabel">/auth/</text>
+  <line x1="880" y1="181" x2="906" y2="181" class="http" marker-end="url(#ahttp)"/>
+
+  <!-- SMB: scanwatch -> file server -->
+  <path d="M 790 410 L 790 96 L 866 96" class="smb" marker-end="url(#asmb)"/>
+  <text x="700" y="90" class="elabel extc">SMB 2/3 :445 read-only</text>
+
+  <!-- NFS: mount into trivy target -->
+  <path d="M 1005 410 L 1005 96 L 1076 96" class="smb" marker-end="url(#asmb)"/>
+  <text x="1010" y="118" class="elabel extc">NFS :2049 ro mount (host kernel)</text>
+
+  <!-- ghcr: trivy DB refresh -->
+  <path d="M 940 424 L 1290 424 L 1290 84" class="smb" marker-end="url(#asmb)"/>
+  <text x="1140" y="417" class="elabel extc">HTTPS :443 vuln DB refresh</text>
+
+  <!-- svc-account tokens: scanwatch + trivy -> keycloak -->
+  <path d="M 700 448 L 655 448 L 655 232 L 720 232 L 720 216" class="http" marker-end="url(#ahttp)"/>
+  <text x="530" y="243" class="elabel">svc-account tokens (client credentials)</text>
+
+  <!-- nginx rail to services -->
+  <path d="M 340 212 L 340 252" class="rail"/>
+  <line x1="120" y1="252" x2="1490" y2="252" class="rail"/>
+  <text x="126" y="246" class="elabel">/api/* reverse proxy (JWT on every call)</text>
+  <line x1="260" y1="252" x2="260" y2="296" class="rail" marker-end="url(#ahttp)"/>
+  <line x1="570" y1="252" x2="570" y2="296" class="rail" marker-end="url(#ahttp)"/>
+  <line x1="775" y1="252" x2="775" y2="296" class="rail" marker-end="url(#ahttp)"/>
+  <line x1="940" y1="252" x2="940" y2="296" class="rail" marker-end="url(#ahttp)"/>
+  <line x1="1100" y1="252" x2="1100" y2="296" class="rail" marker-end="url(#ahttp)"/>
+  <line x1="1255" y1="252" x2="1255" y2="296" class="rail" marker-end="url(#ahttp)"/>
+  <line x1="1415" y1="252" x2="1415" y2="296" class="rail" marker-end="url(#ahttp)"/>
+  <!-- branch rail to row B -->
+  <path d="M 672 252 L 672 392 L 1100 392" class="rail"/>
+  <line x1="740" y1="392" x2="740" y2="406" class="rail" marker-end="url(#ahttp)"/>
+  <line x1="905" y1="392" x2="905" y2="406" class="rail" marker-end="url(#ahttp)"/>
+  <line x1="1075" y1="392" x2="1075" y2="406" class="rail" marker-end="url(#ahttp)"/>
+
+  <!-- read -> scanhistory -->
+  <path d="M 660 330 L 700 330" class="http hi" marker-end="url(#aink)"/>
+  <text x="618" y="320" class="elabel acc">.nessus</text>
+  <!-- scanwatch -> read -->
+  <path d="M 700 470 L 560 470 L 560 380" class="http hi" marker-end="url(#aink)"/>
+  <text x="565" y="463" class="elabel acc">replays uploads :8084</text>
+  <!-- trivy -> scanhistory -->
+  <path d="M 870 440 L 800 440 L 800 380 L 790 380" class="http hi" marker-end="url(#aink)"/>
+  <text x="806" y="434" class="elabel acc">results :8100</text>
+
+  <!-- services -> data band (one representative fat edge) -->
+  <path d="M 300 380 L 300 556" class="mongo" marker-end="url(#amongo)"/>
+  <text x="60" y="475" class="elabel">every service ⇄ its own MongoDB :27017</text>
+  <path d="M 1100 490 L 1100 556" class="mongo acc" marker-end="url(#amacc)"/>
+  <path d="M 1255 380 L 1255 556" class="mongo acc" marker-end="url(#amacc)"/>
+
+  <!-- read-api publish to NATS (corridor) -->
+  <path d="M 600 380 L 600 520 L 490 520 L 490 810" class="nats" marker-end="url(#anats)"/>
+  <text x="497" y="540" class="elabel busc">publishes checklist.save.* · system.patchscan ·</text>
+  <text x="497" y="553" class="elabel busc">system.delete · audit.&gt; (all APIs emit audit)</text>
+
+  <!-- band -> listeners -->
+  <line x1="250" y1="814" x2="250" y2="776" class="nats" marker-end="url(#anats)"/>
+  <line x1="610" y1="814" x2="610" y2="776" class="nats" marker-end="url(#anats)"/>
+  <line x1="835" y1="814" x2="835" y2="776" class="nats" marker-end="url(#anats)"/>
+  <line x1="1035" y1="814" x2="1035" y2="776" class="nats" marker-end="url(#anats)"/>
+  <line x1="1250" y1="814" x2="1250" y2="776" class="nats" marker-end="url(#anats)"/>
+
+  <!-- listeners <-> data band (cross-service reads/writes) -->
+  <line x1="250" y1="700" x2="250" y2="648" class="mongo" marker-end="url(#amongo)"/>
+  <line x1="610" y1="700" x2="610" y2="648" class="mongo acc" marker-end="url(#amacc)"/>
+  <line x1="835" y1="700" x2="835" y2="648" class="mongo acc" marker-end="url(#amacc)"/>
+  <line x1="1035" y1="700" x2="1035" y2="648" class="mongo acc" marker-end="url(#amacc)"/>
+  <line x1="1250" y1="700" x2="1250" y2="648" class="mongo acc" marker-end="url(#amacc)"/>
+  <text x="640" y="688" class="elabel acc">read-only cross-service views: checklistdb · scanhistorydb (findings, scan hosts) · templatedb</text>
+
+  <!-- ======== NODES ======== -->
+  <!-- external row -->
+  <rect x="90" y="24" width="220" height="56" class="node ext"/>
+  <text x="200" y="47" text-anchor="middle" class="ts extc">Analyst / ISSO browser</text>
+  <text x="200" y="64" text-anchor="middle" class="sub">STOOGE UI · Keycloak login</text>
+
+  <rect x="870" y="68" width="170" height="56" class="node ext"/>
+  <text x="955" y="90" text-anchor="middle" class="ts extc">SMB file server</text>
+  <text x="955" y="107" text-anchor="middle" class="tag">scc-drops share</text>
+
+  <rect x="1080" y="68" width="130" height="56" class="node ext"/>
+  <text x="1145" y="90" text-anchor="middle" class="ts extc">NFS export</text>
+  <text x="1145" y="107" text-anchor="middle" class="tag">trivy target</text>
+
+  <rect x="1240" y="28" width="140" height="56" class="node ext"/>
+  <text x="1310" y="50" text-anchor="middle" class="ts extc">ghcr.io</text>
+  <text x="1310" y="67" text-anchor="middle" class="tag">trivy vuln DB</text>
+
+  <!-- edge row -->
+  <rect x="60" y="150" width="560" height="62" class="node mod"/>
+  <text x="340" y="174" text-anchor="middle" class="t">openrmf-web · NGINX <tspan class="tag">:8080</tspan></text>
+  <text x="340" y="192" text-anchor="middle" class="sub">STOOGE UI (14 pages) + reverse proxy + no-cache HTML/JS · Alpine</text>
+
+  <rect x="680" y="150" width="200" height="62" class="node"/>
+  <text x="780" y="174" text-anchor="middle" class="ts">Keycloak <tspan class="tag">:8080 /auth</tspan></text>
+  <text x="780" y="192" text-anchor="middle" class="sub">OIDC · UBI9 lineage</text>
+
+  <rect x="910" y="150" width="130" height="62" class="node"/>
+  <text x="975" y="174" text-anchor="middle" class="ts">PostgreSQL</text>
+  <text x="975" y="192" text-anchor="middle" class="tag">:5432</text>
+
+  <rect x="1070" y="150" width="420" height="62" class="cluster"/>
+  <text x="1086" y="172" class="ts mutedt">Observability</text>
+  <text x="1086" y="190" class="tag">prometheus :9090 · grafana :3000 (/metrics/) · nats-exp :7777 · nginx-exp :9113</text>
+
+  <!-- API row A -->
+  <rect x="60" y="296" width="400" height="84" class="cluster"/>
+  <text x="76" y="318" class="ts">Upstream APIs (Alpine)</text>
+  <text x="76" y="338" class="tag">Scoring :8090 · Template :8088 · Controls :8094</text>
+  <text x="76" y="354" class="tag">Audit :8096 · Report :8098</text>
+
+  <rect x="480" y="296" width="180" height="84" class="node mod"/>
+  <text x="570" y="322" text-anchor="middle" class="t">Read API <tspan class="tag">:8084</tspan></text>
+  <text x="570" y="340" text-anchor="middle" class="sub">save · upload · read</text>
+  <text x="570" y="356" text-anchor="middle" class="sub">SCAP/CKL import</text>
+
+  <rect x="700" y="296" width="150" height="84" class="node new"/>
+  <text x="775" y="320" text-anchor="middle" class="t acc">Scan History <tspan class="tag">:8100</tspan></text>
+  <text x="775" y="338" text-anchor="middle" class="sub">GridFS + delta engine</text>
+  <text x="775" y="354" text-anchor="middle" class="sub">nessus + trivy trends</text>
+
+  <rect x="870" y="296" width="140" height="84" class="node new"/>
+  <text x="940" y="320" text-anchor="middle" class="t acc">POA&amp;M <tspan class="tag">:8102</tspan></text>
+  <text x="940" y="338" text-anchor="middle" class="sub">live record · merge rule</text>
+
+  <rect x="1030" y="296" width="140" height="84" class="node new"/>
+  <text x="1100" y="320" text-anchor="middle" class="t acc">Journal <tspan class="tag">:8104</tspan></text>
+  <text x="1100" y="338" text-anchor="middle" class="sub">notes + evidence (GridFS)</text>
+
+  <rect x="1190" y="296" width="130" height="84" class="node new"/>
+  <text x="1255" y="320" text-anchor="middle" class="t acc">Tasks <tspan class="tag">:8112</tspan></text>
+  <text x="1255" y="338" text-anchor="middle" class="sub">review assignment</text>
+
+  <rect x="1340" y="296" width="150" height="84" class="node new"/>
+  <text x="1415" y="320" text-anchor="middle" class="t acc">ConMon <tspan class="tag">:8108</tspan></text>
+  <text x="1415" y="338" text-anchor="middle" class="sub">SP 800-137 posture</text>
+
+  <!-- API row B -->
+  <rect x="700" y="406" width="150" height="84" class="node new"/>
+  <text x="775" y="430" text-anchor="middle" class="t acc">Scan Watch <tspan class="tag">:8106</tspan></text>
+  <text x="775" y="448" text-anchor="middle" class="sub">SMB poller · web config</text>
+
+  <rect x="870" y="406" width="150" height="84" class="node new"/>
+  <text x="945" y="430" text-anchor="middle" class="t acc">Trivy Scanner <tspan class="tag">:8114</tspan></text>
+  <text x="945" y="448" text-anchor="middle" class="sub">live scans · folder picker</text>
+
+  <rect x="1040" y="406" width="140" height="84" class="node new"/>
+  <text x="1110" y="430" text-anchor="middle" class="t acc">Inventory <tspan class="tag">:8110</tspan></text>
+  <text x="1110" y="448" text-anchor="middle" class="sub">asset classes · mappings</text>
+
+  <!-- data band -->
+  <rect x="60" y="560" width="1430" height="88" class="databand"/>
+  <text x="80" y="586" class="t">Data tier — 13 MongoDB instances <tspan class="tag">:27017</tspan> · one database per service (Ubuntu jammy)</text>
+  <text x="80" y="608" class="tag">checklistdb · scoredb · templatedb · auditdb · reportdb · scanhistorydb (GridFS + Findings + ScanHosts) · poamdb</text>
+  <text x="80" y="624" class="tag">journaldb (GridFS evidence) · scanwatchdb · conmondb · inventorydb (assets + OS mappings) · tasksdb · trivyscandb</text>
+
+  <!-- listener row -->
+  <rect x="60" y="700" width="380" height="76" class="cluster"/>
+  <text x="76" y="722" class="ts">Upstream NATS listeners (Alpine)</text>
+  <text x="76" y="742" class="tag">msg-score · msg-compliance · msg-controls</text>
+  <text x="76" y="758" class="tag">msg-template · msg-system · msg-audit</text>
+
+  <rect x="535" y="700" width="150" height="76" class="node mod"/>
+  <text x="610" y="726" text-anchor="middle" class="ts">msg-reports</text>
+  <text x="610" y="746" text-anchor="middle" class="sub">reads scans from GridFS</text>
+
+  <rect x="760" y="700" width="150" height="76" class="node new"/>
+  <text x="835" y="726" text-anchor="middle" class="ts acc">msg-poam</text>
+  <text x="835" y="746" text-anchor="middle" class="sub">POA&amp;M reconciliation</text>
+
+  <rect x="960" y="700" width="150" height="76" class="node new"/>
+  <text x="1035" y="726" text-anchor="middle" class="ts acc">msg-journal</text>
+  <text x="1035" y="746" text-anchor="middle" class="sub">append-only journal</text>
+
+  <rect x="1175" y="700" width="150" height="76" class="node new"/>
+  <text x="1250" y="726" text-anchor="middle" class="ts acc">msg-inventory</text>
+  <text x="1250" y="746" text-anchor="middle" class="sub">asset sync + classify</text>
+
+  <!-- NATS band -->
+  <rect x="60" y="814" width="1430" height="46" class="band"/>
+  <text x="80" y="842" class="bandtext">NATS message bus · nats:4222</text>
+  <text x="1470" y="842" text-anchor="end" class="bandsub">openrmf.checklist.save.* · openrmf.system.patchscan · openrmf.system.delete · openrmf.audit.&gt;</text>
+
+  <text x="60" y="905" class="sub">All fork services (teal) run on eroman53/openrmf-base-ubi:8.10 — ubi8-minimal + DoD CA bundle, curl/glib2 stripped, 0 CRIT / 1 HIGH per image.</text>
+  <text x="60" y="922" class="sub">Test-only samba container (local override) excluded. Keycloak login theme still upstream-branded.</text>
+</svg>
+</div>
+<div class="hint">scrolls sideways on narrow screens →</div>
+</div>
+
+<h2 class="wrap">2 · Communication ports &amp; protocols (PPSM view)</h2>
+<div class="boundary">
+  <div class="bcard inb">
+    <h3>Inbound (host boundary)</h3>
+    <p><span class="big">1 port</span><br/><span class="mono">8080/tcp</span> HTTP — the only host-published port; UI, all APIs, and OIDC ride through NGINX. TLS on <span class="mono">8443</span> is provisioned (commented) in the config.</p>
+  </div>
+  <div class="bcard outb">
+    <h3>Outbound (host boundary)</h3>
+    <p><span class="big">3 flows</span><br/><span class="mono">445/tcp</span> SMB (scan drops, read-only) · <span class="mono">2049/tcp</span> NFS (trivy target, read-only; +<span class="mono">111</span> for v3) · <span class="mono">443/tcp</span> HTTPS to ghcr.io (Trivy DB; air-gap: pre-seed the cache volume)</p>
+  </div>
+  <div class="bcard internal">
+    <h3>Internal only</h3>
+    <p><span class="big">everything else</span><br/>All service, database, bus, auth, and metrics traffic stays on the internal <span class="mono">openrmf</span> Docker network — nothing below the gateway is host-published.</p>
+  </div>
+</div>
+
+<div class="tablewrap">
+<table class="ppsm">
+  <thead><tr><th>Source</th><th>Destination</th><th>Port</th><th>Protocol / Service</th><th>Purpose</th><th>Direction</th></tr></thead>
+  <tbody>
+    <tr class="grp"><td colspan="6">Boundary-crossing</td></tr>
+    <tr><td>Analyst / ISSO browser</td><td>openrmf-web (NGINX)</td><td class="mono">8080/tcp</td><td>HTTP (TLS 8443 available)</td><td>UI pages, all <span class="mono">/api/*</span> calls, OIDC login redirects</td><td><span class="dir in">inbound</span></td></tr>
+    <tr><td>openrmf-svc-scanwatch</td><td>SMB file server</td><td class="mono">445/tcp</td><td>SMB 2/3</td><td>Polls the scan drop share (read-only account)</td><td><span class="dir out">outbound</span></td></tr>
+    <tr><td>Docker host kernel</td><td>NFS server</td><td class="mono">2049/tcp (+111 v3)</td><td>NFS v4 (v3 opt.)</td><td>Read-only mount of the Trivy scan target</td><td><span class="dir out">outbound</span></td></tr>
+    <tr><td>openrmf-svc-trivy</td><td>ghcr.io</td><td class="mono">443/tcp</td><td>HTTPS / OCI</td><td>Trivy vulnerability DB refresh (cached in volume; skippable air-gapped)</td><td><span class="dir out">outbound</span></td></tr>
+
+    <tr class="grp"><td colspan="6">Gateway (NGINX reverse proxy)</td></tr>
+    <tr><td>NGINX</td><td>Keycloak</td><td class="mono">8080/tcp</td><td>HTTP / OIDC</td><td><span class="mono">/auth/</span> — login, tokens, JWKS</td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>NGINX</td><td>Grafana</td><td class="mono">3000/tcp</td><td>HTTP</td><td><span class="mono">/metrics/</span> dashboards</td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>NGINX</td><td>Read API</td><td class="mono">8084/tcp</td><td>HTTP REST</td><td><span class="mono">/api/read/</span> save · upload · read</td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>NGINX</td><td>Template / Scoring / Controls / Audit / Report APIs</td><td class="mono">8088 · 8090 · 8094 · 8096 · 8098/tcp</td><td>HTTP REST</td><td>Upstream API routes</td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>NGINX</td><td>Scan History / POA&amp;M / Journal / Scan Watch / ConMon / Inventory / Tasks / Trivy Scanner</td><td class="mono">8100 · 8102 · 8104 · 8106 · 8108 · 8110 · 8112 · 8114/tcp</td><td>HTTP REST</td><td>Fork service routes (<span class="mono">/api/scanhistory/ · /api/poam/ · /api/journal/ · /api/scanwatch/ · /api/conmon/ · /api/inventory/ · /api/tasks/ · /api/trivyscan/</span>)</td><td><span class="dir int">internal</span></td></tr>
+
+    <tr class="grp"><td colspan="6">Identity &amp; auth</td></tr>
+    <tr><td>Every API / service</td><td>Keycloak</td><td class="mono">8080/tcp</td><td>HTTP / OIDC</td><td>Issuer discovery + JWKS for JWT validation on every request</td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>Scan Watch · Trivy Scanner</td><td>Keycloak</td><td class="mono">8080/tcp</td><td>HTTP / OIDC token</td><td>Client-credentials tokens (service account <span class="mono">openrmf-scanwatch</span>, Editor+Reader)</td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>Keycloak</td><td>PostgreSQL</td><td class="mono">5432/tcp</td><td>PostgreSQL</td><td>Realm / user store</td><td><span class="dir int">internal</span></td></tr>
+
+    <tr class="grp"><td colspan="6">Service-to-service HTTP</td></tr>
+    <tr><td>Read API</td><td>Scan History API</td><td class="mono">8100/tcp</td><td>HTTP REST</td><td>Streams .nessus uploads into GridFS + delta engine</td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>Scan Watch</td><td>Read API</td><td class="mono">8084/tcp</td><td>HTTP REST</td><td>Replays dropped SCC XCCDF / CKL / Nessus files as authenticated uploads</td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>Trivy Scanner</td><td>Scan History API</td><td class="mono">8100/tcp</td><td>HTTP REST</td><td>Uploads Trivy JSON as <span class="mono">scanType=trivy</span> snapshots</td><td><span class="dir int">internal</span></td></tr>
+
+    <tr class="grp"><td colspan="6">Messaging backbone</td></tr>
+    <tr><td>Read API (+ every API for audit events)</td><td>NATS</td><td class="mono">4222/tcp</td><td>NATS pub</td><td><span class="mono">openrmf.checklist.save.* · system.patchscan · system.delete · audit.&gt;</span></td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>10 msg listeners (score · compliance · controls · template · system · audit · reports · poam · journal · inventory)</td><td>NATS</td><td class="mono">4222/tcp</td><td>NATS sub</td><td>Event-driven reconciliation, journaling, scoring, reporting</td><td><span class="dir int">internal</span></td></tr>
+
+    <tr class="grp"><td colspan="6">Data tier</td></tr>
+    <tr><td>Each service</td><td>Its own MongoDB (13 instances)</td><td class="mono">27017/tcp</td><td>MongoDB wire</td><td>One database per service — no shared writes</td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>msg-poam · msg-reports · msg-journal · msg-inventory · ConMon · Inventory API</td><td>checklistdb · scanhistorydb · templatedb · poamdb</td><td class="mono">27017/tcp</td><td>MongoDB wire</td><td>Deliberate read-only cross-service views (findings, scan hosts, checklists, templates)</td><td><span class="dir int">internal</span></td></tr>
+
+    <tr class="grp"><td colspan="6">Observability</td></tr>
+    <tr><td>Prometheus</td><td>Service <span class="mono">/metrics</span> endpoints · NATS exporter · NGINX exporter</td><td class="mono">service ports · 7777 · 9113/tcp</td><td>HTTP scrape</td><td>Metrics collection across every tier</td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>NATS exporter</td><td>NATS monitoring</td><td class="mono">8222/tcp</td><td>HTTP</td><td>varz / connz / subz</td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>Grafana</td><td>Prometheus</td><td class="mono">9090/tcp</td><td>HTTP / PromQL</td><td>Dashboards (served to users via NGINX <span class="mono">/metrics/</span>)</td><td><span class="dir int">internal</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<footer>
+  Sources: <span class="mono">openrmf-docs/scripts/docker-compose.yml</span> + <span class="mono">nginx.conf</span> as of the UBI8 rebase
+  (2026-07-18). Ports verified against the live nginx upstream config; all fork images scan 0 CRITICAL / 1 accepted HIGH.
+  This matrix doubles as the starting point for the Phase 2 automated PPSM module.
+</footer>
+
+</body>
+</html>
