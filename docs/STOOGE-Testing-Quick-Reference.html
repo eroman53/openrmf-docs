@@ -1,0 +1,274 @@
+<title>STOOGE — Testing Quick Reference</title>
+<style>
+  :root {
+    --bg: #F4F7F6; --panel: #FFFFFF; --ink: #1C262E; --muted: #5C6B76;
+    --line: #93A3AE; --faint: #DCE3E2; --hair: #EAEEED; --accent: #0F766E;
+    --accent-ink: #0B5D57; --accent-tint: rgba(15,118,110,.08); --brand: #d63a22;
+    --brand-tint: rgba(214,58,34,.08); --chip: #EAEFEE; --warn-ink: #9A5B00;
+    --warn-tint: rgba(180,120,20,.12); --code: #33424C;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0F161B; --panel: #17222A; --ink: #E4EBF0; --muted: #93A5B1;
+      --line: #51616D; --faint: #2A3742; --hair: #212D36; --accent: #2FB9A9;
+      --accent-ink: #57D2C2; --accent-tint: rgba(47,185,169,.12); --brand: #ef6a54;
+      --brand-tint: rgba(239,106,84,.13); --chip: #223039; --warn-ink: #E2B672;
+      --warn-tint: rgba(226,182,114,.13); --code: #B7C4CC;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F161B; --panel: #17222A; --ink: #E4EBF0; --muted: #93A5B1;
+    --line: #51616D; --faint: #2A3742; --hair: #212D36; --accent: #2FB9A9;
+    --accent-ink: #57D2C2; --accent-tint: rgba(47,185,169,.12); --brand: #ef6a54;
+    --brand-tint: rgba(239,106,84,.13); --chip: #223039; --warn-ink: #E2B672;
+    --warn-tint: rgba(226,182,114,.13); --code: #B7C4CC;
+  }
+  :root[data-theme="light"] {
+    --bg: #F4F7F6; --panel: #FFFFFF; --ink: #1C262E; --muted: #5C6B76;
+    --line: #93A3AE; --faint: #DCE3E2; --hair: #EAEEED; --accent: #0F766E;
+    --accent-ink: #0B5D57; --accent-tint: rgba(15,118,110,.08); --brand: #d63a22;
+    --brand-tint: rgba(214,58,34,.08); --chip: #EAEFEE; --warn-ink: #9A5B00;
+    --warn-tint: rgba(180,120,20,.12); --code: #33424C;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink); margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size: 15px; line-height: 1.6; padding: 40px 24px 72px;
+  }
+  .mono { font-family: "Cascadia Code", Consolas, ui-monospace, monospace; font-size: .9em; }
+  code { font-family: "Cascadia Code", Consolas, ui-monospace, monospace; font-size: .86em;
+    background: var(--chip); color: var(--code); padding: 1px 6px; border-radius: 4px; white-space: nowrap; }
+  .wrap { max-width: 880px; margin: 0 auto; }
+
+  header { max-width: 880px; margin: 0 auto 22px; }
+  .kicker { display: flex; align-items: center; gap: 9px; font-size: 12px; letter-spacing: .13em;
+    text-transform: uppercase; color: var(--brand); font-weight: 650; margin-bottom: 12px;
+    font-family: "Cascadia Code", Consolas, ui-monospace, monospace; }
+  .beacon { width: 12px; height: 12px; border-radius: 50%; background: var(--brand);
+    box-shadow: 0 0 0 4px var(--brand-tint); flex: none; }
+  h1 { font-size: 31px; font-weight: 680; letter-spacing: -.02em; margin: 0 0 6px; text-wrap: balance; }
+  .sub { color: var(--muted); margin: 0; max-width: 62ch; }
+
+  .env { max-width: 880px; margin: 0 auto 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 680px) { .env { grid-template-columns: 1fr; } }
+  .envcard { background: var(--panel); border: 1px solid var(--faint); border-radius: 10px; padding: 15px 18px; }
+  .envcard h3 { margin: 0 0 8px; font-size: 11.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+  .envcard .url { font-size: 17px; font-weight: 640; }
+  .cred { display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+    padding: 6px 0; border-bottom: 1px solid var(--hair); }
+  .cred:last-child { border-bottom: 0; }
+  .cred .who { font-weight: 620; }
+  .cred .meta { font-size: 12px; color: var(--muted); text-align: right; }
+
+  .legend { max-width: 880px; margin: -14px auto 30px; display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 12.5px; color: var(--muted); align-items: center; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 640; padding: 2px 9px; border-radius: 20px;
+    letter-spacing: .02em; white-space: nowrap; }
+  .b-admin { background: var(--brand-tint); color: var(--brand); border: 1px solid var(--brand); }
+  .b-edit { background: var(--accent-tint); color: var(--accent-ink); border: 1px solid var(--accent); }
+  .b-any { background: var(--chip); color: var(--muted); border: 1px solid var(--faint); }
+
+  h2.sec { max-width: 880px; margin: 40px auto 4px; font-size: 13px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted); font-weight: 650;
+    border-bottom: 1px solid var(--faint); padding-bottom: 8px; }
+
+  .feat { background: var(--panel); border: 1px solid var(--faint); border-radius: 12px;
+    padding: 20px 22px; margin: 16px 0; }
+  .feat-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 3px; }
+  .feat-num { font-family: "Cascadia Code", Consolas, ui-monospace, monospace; font-size: 13px;
+    color: var(--brand); font-weight: 650; }
+  .feat h3 { margin: 0; font-size: 19px; font-weight: 650; letter-spacing: -.01em; }
+  .feat .badge { margin-left: auto; }
+  .whereline { font-size: 13px; color: var(--muted); margin: 4px 0 14px; }
+  .whereline b { color: var(--ink); font-weight: 600; }
+  .what { margin: 0 0 14px; }
+
+  .steps { margin: 0; padding: 0; list-style: none; counter-reset: s; }
+  .steps li { counter-increment: s; position: relative; padding: 0 0 8px 30px; font-size: 14px; }
+  .steps li::before { content: counter(s); position: absolute; left: 0; top: 0;
+    width: 20px; height: 20px; border-radius: 50%; background: var(--accent-tint);
+    color: var(--accent-ink); border: 1px solid var(--accent); font-size: 11px; font-weight: 650;
+    display: flex; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+  .steps li:last-child { padding-bottom: 0; }
+
+  .expect, .gotcha { display: flex; gap: 9px; font-size: 13.5px; margin-top: 13px;
+    padding: 9px 13px; border-radius: 8px; align-items: flex-start; }
+  .expect { background: var(--accent-tint); }
+  .expect .tag { color: var(--accent-ink); }
+  .gotcha { background: var(--warn-tint); }
+  .gotcha .tag { color: var(--warn-ink); }
+  .expect .tag, .gotcha .tag { font-weight: 680; font-size: 11px; letter-spacing: .05em;
+    text-transform: uppercase; flex: none; padding-top: 1px; }
+
+  footer { max-width: 880px; margin: 44px auto 0; padding-top: 16px; border-top: 1px solid var(--faint);
+    font-size: 12.5px; color: var(--muted); }
+  footer .mono { display: block; margin-top: 6px; }
+</style>
+
+<header>
+  <div class="kicker"><span class="beacon"></span> STOOGE · STIG Tracking, Oversight &amp; Organizational Governance Engine</div>
+  <h1>Testing Quick Reference</h1>
+  <p class="sub">Where to find each new feature, the role you need, how to exercise it, what to expect, and the gotchas
+    to watch for. Built for the local test stack.</p>
+</header>
+
+<div class="env">
+  <div class="envcard">
+    <h3>Test Environment</h3>
+    <div class="url mono">http://192.168.254.50:8080</div>
+    <p style="margin:8px 0 0; font-size:13px; color:var(--muted);">Log in through Keycloak. After any UI update do one
+      hard refresh (<b>Ctrl&#8209;Shift&#8209;R</b>) the first time.</p>
+  </div>
+  <div class="envcard">
+    <h3>Test Accounts</h3>
+    <div class="cred"><span class="who">testadmin</span><span class="meta"><span class="mono">TestAdmin12!!</span><br>Administrator · team-alpha</span></div>
+    <div class="cred"><span class="who">analyst2</span><span class="meta"><span class="mono">Analyst2Pass!!</span><br>Reader/Editor/Assessor · team-bravo</span></div>
+  </div>
+</div>
+
+<div class="legend">
+  <span>Role needed:</span>
+  <span><span class="badge b-admin">Admin</span> Administrator only</span>
+  <span><span class="badge b-edit">Editor+</span> Editor / Assessor / Admin</span>
+  <span><span class="badge b-any">Any role</span> Reader and up</span>
+</div>
+
+<h2 class="sec">Access &amp; foundational</h2>
+
+<div class="feat">
+  <div class="feat-head"><span class="feat-num">01</span><h3>Package Access (RBAC)</h3><span class="badge b-admin">Admin</span></div>
+  <div class="whereline"><b>Where:</b> System Packages → open a package → <b>Update System</b> → “Package Access” section</div>
+  <p class="what">Restrict a system package so only chosen Keycloak teams (or usernames) can see and use it. Unrestricted
+    packages stay visible to everyone. Enforced across every fork service.</p>
+  <ul class="steps">
+    <li>As <b>testadmin</b>, open a package and its Update System modal; tick <b>Restrict this package</b> and enter <code>team-alpha</code>, then Save Access.</li>
+    <li>Log in as <b>analyst2</b> (team-bravo) in a separate/private window.</li>
+    <li>Check the System Packages list, and try ConMon, Inventory, POA&amp;M, Tasks for that package.</li>
+    <li>Back as testadmin, verify the same package still opens normally.</li>
+  </ul>
+  <div class="expect"><span class="tag">Expect</span><div>analyst2 does <b>not</b> see the restricted package in any list/dropdown and gets “forbidden” (HTTP 403) on direct access; testadmin (admin) sees everything. Set it back to unrestricted and analyst2 can see it again.</div></div>
+  <div class="gotcha"><span class="tag">Gotcha</span><div>A just-restarted service can briefly 403 on the first cold request before its checklist-DB read warms — retry once. Admins and internal service accounts always bypass RBAC by design.</div></div>
+</div>
+
+<h2 class="sec">Scanning &amp; vulnerability data</h2>
+
+<div class="feat">
+  <div class="feat-head"><span class="feat-num">02</span><h3>Container Security (Trivy)</h3><span class="badge b-edit">Editor+</span></div>
+  <div class="whereline"><b>Where:</b> sidebar → <b>Container Security</b></div>
+  <p class="what">Runs the built-in Trivy scanner against a mounted folder (host path or NFS share), stores results with
+    the same delta/trend engine as Nessus, and shows scan history, trends, and open findings.</p>
+  <ul class="steps">
+    <li>Pick a <b>System Package</b> to attach results to.</li>
+    <li>Click <b>Browse</b> and traverse the mounted share to choose the folder to scan.</li>
+    <li>Click <b>Scan Now</b>; wait, then <b>Refresh</b>.</li>
+    <li>Review the run log, the Scan History &amp; Trend table, and Open Findings.</li>
+    <li>Change a dependency file in the folder and scan again to see a delta.</li>
+  </ul>
+  <div class="expect"><span class="tag">Expect</span><div>A “success” run row with C/H/M/L counts; findings listed by target and <code>CVE|package</code>. A second scan shows new/resolved/persisting deltas and a second trend snapshot.</div></div>
+  <div class="gotcha"><span class="tag">Gotcha</span><div>The very first scan downloads Trivy’s vuln DB (slower); later scans take seconds. Narrowing the target folder marks now-out-of-scope findings “resolved” — keep a stable target per package for clean trends.</div></div>
+</div>
+
+<div class="feat">
+  <div class="feat-head"><span class="feat-num">03</span><h3>Scan Watch (automated ingest)</h3><span class="badge b-admin">Admin</span></div>
+  <div class="whereline"><b>Where:</b> sidebar → <b>Scan Watch</b></div>
+  <p class="what">Point STOOGE at an SMB share (or mounted folder) your cron job fills with scans; it auto-ingests new
+    SCC XCCDF, <code>.ckl</code>, and <code>.nessus</code> files.</p>
+  <ul class="steps">
+    <li>Enter the file server, share, and a <b>read-only</b> account; click <b>Test Connection</b> to preview the folders.</li>
+    <li>Save &amp; enable. Drop a file into a subfolder named exactly like a system package.</li>
+    <li>Wait one poll cycle, then review the ingest log on the page.</li>
+  </ul>
+  <div class="expect"><span class="tag">Expect</span><div>Test Connection lists the system folders; dropped files appear in the ingest log as “success” and show up on the matching package (checklists, trends, POA&amp;M).</div></div>
+  <div class="gotcha"><span class="tag">Gotcha</span><div>The subfolder name must match the system package <b>title</b> exactly (case-insensitive). Files newer than the “settle time” are skipped until they stop changing. Identical file content ingests only once.</div></div>
+</div>
+
+<div class="feat">
+  <div class="feat-head"><span class="feat-num">04</span><h3>Vulnerability Trends</h3><span class="badge b-any">Any role</span></div>
+  <div class="whereline"><b>Where:</b> sidebar → <b>Reports</b> → Vulnerability Trends</div>
+  <p class="what">Charts a system’s Nessus scan history — severity totals over time and new/resolved/persisting deltas per scan.</p>
+  <ul class="steps">
+    <li>Choose a system package that has more than one Nessus scan.</li>
+    <li>Read the trend chart and the per-scan delta values.</li>
+  </ul>
+  <div class="expect"><span class="tag">Expect</span><div>One point per scan in chronological order; deltas that reconcile against the prior scan (findings keyed by host + plugin).</div></div>
+</div>
+
+<h2 class="sec">Monitoring, inventory &amp; remediation</h2>
+
+<div class="feat">
+  <div class="feat-head"><span class="feat-num">05</span><h3>Continuous Monitoring (ConMon)</h3><span class="badge b-any">Any role</span></div>
+  <div class="whereline"><b>Where:</b> sidebar → <b>ConMon</b> · policy editing is <span class="badge b-admin">Admin</span></div>
+  <p class="what">SP 800-137 posture per system: scan/checklist freshness, open-finding aging, POA&amp;M schedule health,
+    asset coverage gaps, and STIG benchmark currency — with a cadence policy you set.</p>
+  <ul class="steps">
+    <li>Read the portfolio table (freshness badges, overdue counts, coverage gaps, outdated STIGs).</li>
+    <li>Click a system’s detail to see coverage host lists, aging buckets, and benchmark currency.</li>
+    <li>As admin, edit the <b>Cadence Policy</b> (e.g. patch-scan every 1 day) and Save; watch the freshness badge change.</li>
+  </ul>
+  <div class="expect"><span class="tag">Expect</span><div>Green/amber/red freshness against your policy; coverage lists the right scanned-but-unchecklisted and checklisted-but-unscanned hosts; a shorter cadence flips a fresh scan to amber/red.</div></div>
+  <div class="gotcha"><span class="tag">Gotcha</span><div>Some checklists show benchmark currency “unknown” when the STIG short title doesn’t match a template (e.g. Apache 2.2, RHEL 7) — expected until the title-mapping table is enriched.</div></div>
+</div>
+
+<div class="feat">
+  <div class="feat-head"><span class="feat-num">06</span><h3>System Inventory</h3><span class="badge b-any">Any role</span> <span class="badge b-edit" style="margin-left:6px;">Editor+ to edit</span></div>
+  <div class="whereline"><b>Where:</b> sidebar → <b>Inventory</b> · OS mapping rules are <span class="badge b-admin">Admin</span></div>
+  <p class="what">Every host the platform has seen, classified into OS classes (Windows 11, RHEL 8, …) with fleet
+    findings — “this CVE affects N of M RHEL 8 assets.”</p>
+  <ul class="steps">
+    <li>Choose a system; click the OS-class chips to filter the asset list.</li>
+    <li>Pick a class to open the <b>findings-by-class</b> panel.</li>
+    <li>Edit an asset (pencil) to set its OS/type manually — it gets a lock icon.</li>
+    <li>As admin, add/edit an <b>OS normalization mapping</b> rule; click <b>Reconcile Inventory</b>.</li>
+  </ul>
+  <div class="expect"><span class="tag">Expect</span><div>Assets grouped by class with counts; fleet findings show affected/total hosts; a manually classified (locked) asset survives Reconcile; a new mapping rule reclassifies matching hosts.</div></div>
+  <div class="gotcha"><span class="tag">Gotcha</span><div>Systems whose scans were uploaded before OS-capture need one scan re-upload (or the <b>Reconcile</b> button) to populate OS from scan data; checklist-based classification works immediately.</div></div>
+</div>
+
+<div class="feat">
+  <div class="feat-head"><span class="feat-num">07</span><h3>Live POA&amp;M</h3><span class="badge b-edit">Editor+</span></div>
+  <div class="whereline"><b>Where:</b> sidebar → <b>POA&amp;M</b></div>
+  <p class="what">A live Plan of Action &amp; Milestones auto-built from findings, with the merge rule that never clobbers
+    your edits, plus XLSX export.</p>
+  <ul class="steps">
+    <li>Choose a system and Load POA&amp;M; filter by status.</li>
+    <li>Edit an item (mitigations, status, milestones) and Save.</li>
+    <li>Re-upload a scan for that system, then reload the POA&amp;M.</li>
+    <li>Export XLSX.</li>
+  </ul>
+  <div class="expect"><span class="tag">Expect</span><div>Auto-created draft items for open findings; your hand edits survive reconciliation while automation still updates “last seen”; resolved findings move to “Completed – Pending Verification” (never deleted). XLSX opens with the records.</div></div>
+</div>
+
+<div class="feat">
+  <div class="feat-head"><span class="feat-num">08</span><h3>Review Tasks</h3><span class="badge b-edit">Editor+</span></div>
+  <div class="whereline"><b>Where:</b> sidebar → <b>Tasks</b></div>
+  <p class="what">Assign checklist / vulnerability / POA&amp;M reviews to users with priority, due date, status workflow,
+    comments, and full change history.</p>
+  <ul class="steps">
+    <li>New Task → pick a system, target a checklist (picker), set assignee = <code>analyst2</code>, priority, due date.</li>
+    <li>Switch a task’s status; add a comment.</li>
+    <li>Log in as <b>analyst2</b> and open <b>My Tasks</b>.</li>
+    <li>Set a due date in the past to check overdue highlighting.</li>
+  </ul>
+  <div class="expect"><span class="tag">Expect</span><div>The task appears in analyst2’s My Tasks; every status/field change is recorded in the task history with who/when; a past due date shows a red overdue flag. A status-only edit leaves other fields untouched.</div></div>
+</div>
+
+<h2 class="sec">Behind-the-scenes (API-level)</h2>
+
+<div class="feat">
+  <div class="feat-head"><span class="feat-num">09</span><h3>Journal &amp; Evidence</h3><span class="badge b-any">API</span></div>
+  <div class="whereline"><b>Where:</b> <code>/api/journal/</code> — no dedicated UI page yet</div>
+  <p class="what">An append-only change journal (who/what/when) built from platform events, plus user notes and file
+    evidence attachable to any entity. Observable via the API; every action you take above also lands here.</p>
+  <ul class="steps">
+    <li>Do any action (upload, POA&amp;M edit, scan) as testadmin.</li>
+    <li>Query <code>GET /api/journal/journal/system/{systemGroupId}</code> and <code>/journal/activity</code> with a bearer token.</li>
+    <li>Optionally POST a note or an evidence file, then download the evidence back.</li>
+  </ul>
+  <div class="expect"><span class="tag">Expect</span><div>Activity entries attributed to the acting user; evidence round-trips byte-for-byte with a recorded SHA-256.</div></div>
+</div>
+
+<footer>
+  Covers features added in the STOOGE fork of OpenRMF OSS. All fork services run on the UBI8 (RHEL&nbsp;8.10) base.
+  Test data and helper scripts live in <span class="mono">d:\OpenRMF_Build\test-artifacts</span>.
+</footer>
