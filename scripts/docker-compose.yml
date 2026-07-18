@@ -98,6 +98,8 @@ services:
       - DBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@scanhistorydb/openrmfscanhistory?authSource=openrmfscanhistory
       - DB=openrmfscanhistory
       - DBTYPE=mongo
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDB=openrmf
       - LOGLEVEL=3
     depends_on:
       - scanhistorydb
@@ -118,6 +120,8 @@ services:
       - DBCONNECTION=mongodb://openrmfpoam:openrmf1234!@poamdb/openrmfpoam?authSource=openrmfpoam
       - DB=openrmfpoam
       - DBTYPE=mongo
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDB=openrmf
       - LOGLEVEL=3
     depends_on:
       - poamdb
@@ -138,6 +142,8 @@ services:
       - DBCONNECTION=mongodb://openrmfjournal:openrmf1234!@journaldb/openrmfjournal?authSource=openrmfjournal
       - DB=openrmfjournal
       - DBTYPE=mongo
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDB=openrmf
       - LOGLEVEL=3
     depends_on:
       - journaldb
@@ -377,6 +383,8 @@ services:
       - DBCONNECTION=mongodb://openrmftasks:openrmf1234!@tasksdb/openrmftasks?authSource=openrmftasks
       - DB=openrmftasks
       - DBTYPE=mongo
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDB=openrmf
       - LOGLEVEL=3
     depends_on:
       - tasksdb
