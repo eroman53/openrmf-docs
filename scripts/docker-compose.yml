@@ -34,12 +34,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8090
-      - DBCONNECTION=mongodb://openrmfscore:openrmf1234!@scoredb/openrmfscore?authSource=openrmfscore
+      - DBCONNECTION=mongodb://openrmfscore:openrmf1234!@mongodb/openrmfscore?authSource=openrmfscore
       - DBTYPE=mongo
       - DB=openrmfscore
       - LOGLEVEL=3
     depends_on:
-      - scoredb
+      - mongodb
     networks:
       - openrmf
   
@@ -54,12 +54,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8088
       - NATSSERVERURL=nats://natsserver:4222
-      - DBCONNECTION=mongodb://openrmftemplate:openrmf1234!@templatedb/openrmftemplate?authSource=openrmftemplate
+      - DBCONNECTION=mongodb://openrmftemplate:openrmf1234!@mongodb/openrmftemplate?authSource=openrmftemplate
       - DB=openrmftemplate
       - DBTYPE=mongo
       - LOGLEVEL=3
     depends_on:
-      - templatedb
+      - mongodb
     networks:
       - openrmf
 
@@ -74,13 +74,13 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8084
       - NATSSERVERURL=nats://natsserver:4222
-      - DBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - DBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
       - DB=openrmf
       - DBTYPE=mongo
       - SCANHISTORYAPIURL=http://openrmfapi-scanhistory:8100
       - LOGLEVEL=3
     depends_on:
-      - checklistdb
+      - mongodb
       - openrmfapi-scanhistory
     networks:
       - openrmf
@@ -95,14 +95,14 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8100
-      - DBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@scanhistorydb/openrmfscanhistory?authSource=openrmfscanhistory
+      - DBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
       - DB=openrmfscanhistory
       - DBTYPE=mongo
-      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
       - LOGLEVEL=3
     depends_on:
-      - scanhistorydb
+      - mongodb
     networks:
       - openrmf
 
@@ -117,14 +117,14 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8102
       - NATSSERVERURL=nats://natsserver:4222
-      - DBCONNECTION=mongodb://openrmfpoam:openrmf1234!@poamdb/openrmfpoam?authSource=openrmfpoam
+      - DBCONNECTION=mongodb://openrmfpoam:openrmf1234!@mongodb/openrmfpoam?authSource=openrmfpoam
       - DB=openrmfpoam
       - DBTYPE=mongo
-      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
       - LOGLEVEL=3
     depends_on:
-      - poamdb
+      - mongodb
       - natsserver
     networks:
       - openrmf
@@ -139,14 +139,14 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8104
-      - DBCONNECTION=mongodb://openrmfjournal:openrmf1234!@journaldb/openrmfjournal?authSource=openrmfjournal
+      - DBCONNECTION=mongodb://openrmfjournal:openrmf1234!@mongodb/openrmfjournal?authSource=openrmfjournal
       - DB=openrmfjournal
       - DBTYPE=mongo
-      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
       - LOGLEVEL=3
     depends_on:
-      - journaldb
+      - mongodb
     networks:
       - openrmf
 
@@ -175,13 +175,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8096
-      - DBCONNECTION=mongodb://openrmfaudit:openrmf1234!@auditdb/openrmfaudit?authSource=openrmfaudit
+      - DBCONNECTION=mongodb://openrmfaudit:openrmf1234!@mongodb/openrmfaudit?authSource=openrmfaudit
       - DB=openrmfaudit
       - DBTYPE=mongo
       - NATSSERVERURL=nats://natsserver:4222
       - LOGLEVEL=3
     depends_on:
-      - auditdb
+      - mongodb
     networks:
       - openrmf
 
@@ -195,13 +195,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8098
-      - DBCONNECTION=mongodb://openrmfreport:openrmf1234!@reportdb/openrmfreport?authSource=openrmfreport
+      - DBCONNECTION=mongodb://openrmfreport:openrmf1234!@mongodb/openrmfreport?authSource=openrmfreport
       - DB=openrmfreport
       - DBTYPE=mongo
       - NATSSERVERURL=nats://natsserver:4222
       - LOGLEVEL=3
     depends_on:
-      - reportdb
+      - mongodb
     networks:
       - openrmf
 
@@ -211,13 +211,13 @@ services:
     container_name: openrmf-score-nats-message-client
     restart: on-failure:5
     environment:
-      - DBCONNECTION=mongodb://openrmfscore:openrmf1234!@scoredb/openrmfscore?authSource=openrmfscore
+      - DBCONNECTION=mongodb://openrmfscore:openrmf1234!@mongodb/openrmfscore?authSource=openrmfscore
       - DBTYPE=mongo
       - DB=openrmfscore
       - NATSSERVERURL=nats://natsserver:4222
       - LOGLEVEL=3
     depends_on:
-      - scoredb
+      - mongodb
       - natsserver
     networks:
       - openrmf
@@ -251,13 +251,13 @@ services:
     container_name: openrmf-template-nats-message-client
     restart: on-failure:5
     environment:
-      - DBCONNECTION=mongodb://openrmftemplate:openrmf1234!@templatedb/openrmftemplate?authSource=openrmftemplate
+      - DBCONNECTION=mongodb://openrmftemplate:openrmf1234!@mongodb/openrmftemplate?authSource=openrmftemplate
       - DB=openrmftemplate
       - DBTYPE=mongo
       - NATSSERVERURL=nats://natsserver:4222
       - LOGLEVEL=3
     depends_on:
-      - templatedb
+      - mongodb
       - natsserver
     networks:
       - openrmf
@@ -267,13 +267,13 @@ services:
     container_name: openrmf-system-nats-message-client
     restart: on-failure:5
     environment:
-      - DBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - DBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
       - DB=openrmf
       - DBTYPE=mongo
       - NATSSERVERURL=nats://natsserver:4222
       - LOGLEVEL=3
     depends_on:
-      - checklistdb
+      - mongodb
       - natsserver
     networks:
       - openrmf
@@ -283,13 +283,13 @@ services:
     container_name: openrmf-audit-nats-message-client
     restart: on-failure:5
     environment:
-      - DBCONNECTION=mongodb://openrmfaudit:openrmf1234!@auditdb/openrmfaudit?authSource=openrmfaudit
+      - DBCONNECTION=mongodb://openrmfaudit:openrmf1234!@mongodb/openrmfaudit?authSource=openrmfaudit
       - DB=openrmfaudit
       - DBTYPE=mongo
       - NATSSERVERURL=nats://natsserver:4222
       - LOGLEVEL=3
     depends_on:
-      - auditdb
+      - mongodb
       - natsserver
     networks:
       - openrmf
@@ -299,20 +299,18 @@ services:
     container_name: openrmf-report-nats-message-client
     restart: on-failure:5
     environment:
-      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
       - SYSTEMDBTYPE=mongo
-      - REPORTDBCONNECTION=mongodb://openrmfreport:openrmf1234!@reportdb/openrmfreport?authSource=openrmfreport
+      - REPORTDBCONNECTION=mongodb://openrmfreport:openrmf1234!@mongodb/openrmfreport?authSource=openrmfreport
       - REPORTDB=openrmfreport
       - REPORTDBTYPE=mongo
-      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@scanhistorydb/openrmfscanhistory?authSource=openrmfscanhistory
+      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
       - SCANHISTORYDB=openrmfscanhistory
       - NATSSERVERURL=nats://natsserver:4222
       - LOGLEVEL=3
     depends_on:
-      - checklistdb
-      - reportdb
-      - scanhistorydb
+      - mongodb
       - natsserver
     networks:
       - openrmf
@@ -322,18 +320,16 @@ services:
     container_name: openrmf-poam-nats-message-client
     restart: on-failure:5
     environment:
-      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
-      - POAMDBCONNECTION=mongodb://openrmfpoam:openrmf1234!@poamdb/openrmfpoam?authSource=openrmfpoam
+      - POAMDBCONNECTION=mongodb://openrmfpoam:openrmf1234!@mongodb/openrmfpoam?authSource=openrmfpoam
       - POAMDB=openrmfpoam
-      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@scanhistorydb/openrmfscanhistory?authSource=openrmfscanhistory
+      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
       - SCANHISTORYDB=openrmfscanhistory
       - NATSSERVERURL=nats://natsserver:4222
       - LOGLEVEL=3
     depends_on:
-      - checklistdb
-      - poamdb
-      - scanhistorydb
+      - mongodb
       - natsserver
     networks:
       - openrmf
@@ -348,7 +344,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8114
-      - DBCONNECTION=mongodb://openrmftrivyscan:openrmf1234!@trivyscandb/openrmftrivyscan?authSource=openrmftrivyscan
+      - DBCONNECTION=mongodb://openrmftrivyscan:openrmf1234!@mongodb/openrmftrivyscan?authSource=openrmftrivyscan
       - DB=openrmftrivyscan
       - SCANHISTORYAPIURL=http://openrmfapi-scanhistory:8100
       - KEYCLOAKTOKENURL=http://openrmf-keycloak:8080/auth/realms/openrmf/protocol/openid-connect/token
@@ -365,7 +361,7 @@ services:
       # persists the ~60MB Trivy vulnerability DB across container recreation
       - trivyscan-cache-volume:/app/.trivycache
     depends_on:
-      - trivyscandb
+      - mongodb
       - openrmfapi-scanhistory
     networks:
       - openrmf
@@ -380,14 +376,14 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8112
-      - DBCONNECTION=mongodb://openrmftasks:openrmf1234!@tasksdb/openrmftasks?authSource=openrmftasks
+      - DBCONNECTION=mongodb://openrmftasks:openrmf1234!@mongodb/openrmftasks?authSource=openrmftasks
       - DB=openrmftasks
       - DBTYPE=mongo
-      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
       - LOGLEVEL=3
     depends_on:
-      - tasksdb
+      - mongodb
     networks:
       - openrmf
 
@@ -401,19 +397,17 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8110
-      - DBCONNECTION=mongodb://openrmfinventory:openrmf1234!@inventorydb/openrmfinventory?authSource=openrmfinventory
+      - DBCONNECTION=mongodb://openrmfinventory:openrmf1234!@mongodb/openrmfinventory?authSource=openrmfinventory
       - DB=openrmfinventory
       - DBTYPE=mongo
       # read-only cross-service views for reconciliation and fleet findings
-      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
-      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@scanhistorydb/openrmfscanhistory?authSource=openrmfscanhistory
+      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
       - SCANHISTORYDB=openrmfscanhistory
       - LOGLEVEL=3
     depends_on:
-      - inventorydb
-      - checklistdb
-      - scanhistorydb
+      - mongodb
     networks:
       - openrmf
 
@@ -427,25 +421,21 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8108
-      - DBCONNECTION=mongodb://openrmfconmon:openrmf1234!@conmondb/openrmfconmon?authSource=openrmfconmon
+      - DBCONNECTION=mongodb://openrmfconmon:openrmf1234!@mongodb/openrmfconmon?authSource=openrmfconmon
       - DB=openrmfconmon
       - DBTYPE=mongo
       # read-only cross-service views for posture computation
-      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
-      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@scanhistorydb/openrmfscanhistory?authSource=openrmfscanhistory
+      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
       - SCANHISTORYDB=openrmfscanhistory
-      - POAMDBCONNECTION=mongodb://openrmfpoam:openrmf1234!@poamdb/openrmfpoam?authSource=openrmfpoam
+      - POAMDBCONNECTION=mongodb://openrmfpoam:openrmf1234!@mongodb/openrmfpoam?authSource=openrmfpoam
       - POAMDB=openrmfpoam
-      - TEMPLATEDBCONNECTION=mongodb://openrmftemplate:openrmf1234!@templatedb/openrmftemplate?authSource=openrmftemplate
+      - TEMPLATEDBCONNECTION=mongodb://openrmftemplate:openrmf1234!@mongodb/openrmftemplate?authSource=openrmftemplate
       - TEMPLATEDB=openrmftemplate
       - LOGLEVEL=3
     depends_on:
-      - conmondb
-      - checklistdb
-      - scanhistorydb
-      - poamdb
-      - templatedb
+      - mongodb
     networks:
       - openrmf
 
@@ -465,11 +455,11 @@ services:
       - KEYCLOAKTOKENURL=http://openrmf-keycloak:8080/auth/realms/openrmf/protocol/openid-connect/token
       - CLIENTID=openrmf-scanwatch
       - CLIENTSECRET=${SCANWATCH_CLIENTSECRET}
-      - DBCONNECTION=mongodb://openrmfscanwatch:openrmf1234!@scanwatchdb/openrmfscanwatch?authSource=openrmfscanwatch
+      - DBCONNECTION=mongodb://openrmfscanwatch:openrmf1234!@mongodb/openrmfscanwatch?authSource=openrmfscanwatch
       - DB=openrmfscanwatch
       - LOGLEVEL=2
     depends_on:
-      - scanwatchdb
+      - mongodb
       - openrmfapi-read
     networks:
       - openrmf
@@ -479,18 +469,16 @@ services:
     container_name: openrmf-inventory-nats-message-client
     restart: on-failure:5
     environment:
-      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
-      - INVENTORYDBCONNECTION=mongodb://openrmfinventory:openrmf1234!@inventorydb/openrmfinventory?authSource=openrmfinventory
+      - INVENTORYDBCONNECTION=mongodb://openrmfinventory:openrmf1234!@mongodb/openrmfinventory?authSource=openrmfinventory
       - INVENTORYDB=openrmfinventory
-      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@scanhistorydb/openrmfscanhistory?authSource=openrmfscanhistory
+      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
       - SCANHISTORYDB=openrmfscanhistory
       - NATSSERVERURL=nats://natsserver:4222
       - LOGLEVEL=2
     depends_on:
-      - checklistdb
-      - inventorydb
-      - scanhistorydb
+      - mongodb
       - natsserver
     networks:
       - openrmf
@@ -500,23 +488,24 @@ services:
     container_name: openrmf-journal-nats-message-client
     restart: on-failure:5
     environment:
-      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@checklistdb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
-      - JOURNALDBCONNECTION=mongodb://openrmfjournal:openrmf1234!@journaldb/openrmfjournal?authSource=openrmfjournal
+      - JOURNALDBCONNECTION=mongodb://openrmfjournal:openrmf1234!@mongodb/openrmfjournal?authSource=openrmfjournal
       - JOURNALDB=openrmfjournal
       - NATSSERVERURL=nats://natsserver:4222
       - LOGLEVEL=3
     depends_on:
-      - checklistdb
-      - journaldb
+      - mongodb
       - natsserver
     networks:
       - openrmf
 
-### 5 MongoDB Containers
-  checklistdb:
+### MongoDB (consolidated: one instance hosts every service database; the
+### "one database per service, no shared writes" rule is preserved via
+### per-database users -- see initializeAll.js)
+  mongodb:
     image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
-    container_name: mongodb-checklist
+    container_name: mongodb
     restart: on-failure:5
     ports:
       - "27017"
@@ -525,203 +514,10 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
       - MONGO_INITDB_DATABASE=openrmf
     volumes:
-      - checklist-data-volume:/data/db
-      - ./initializeChecklist.js:/docker-entrypoint-initdb.d/initialize.js:Z
+      - mongo-data-volume:/data/db
+      - ./initializeAll.js:/docker-entrypoint-initdb.d/initialize.js:Z
     networks:
       - openrmf
-
-  scoredb:
-    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
-    container_name: mongodb-score
-    restart: on-failure:5
-    ports:
-      - "27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
-      - MONGO_INITDB_DATABASE=openrmfscore
-    volumes:
-      - score-data-volume:/data/db
-      - ./initializeScore.js:/docker-entrypoint-initdb.d/initialize.js:Z
-    networks:
-      - openrmf
-
-  templatedb:
-    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
-    container_name: mongodb-template
-    restart: on-failure:5
-    ports:
-      - "27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
-      - MONGO_INITDB_DATABASE=openrmftemplate
-    volumes:
-      - template-data-volume:/data/db
-      - ./initializeTemplate.js:/docker-entrypoint-initdb.d/initialize.js:Z
-    networks:
-      - openrmf
-
-  auditdb:
-    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
-    container_name: mongodb-audit
-    restart: on-failure:5
-    ports:
-      - "27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
-      - MONGO_INITDB_DATABASE=openrmfaudit
-    volumes:
-      - audit-data-volume:/data/db
-      - ./initializeAudit.js:/docker-entrypoint-initdb.d/initialize.js:Z
-    networks:
-      - openrmf
-
-  reportdb:
-    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
-    container_name: mongodb-report
-    restart: on-failure:5
-    ports:
-      - "27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
-      - MONGO_INITDB_DATABASE=openrmfreport
-    volumes:
-      - report-data-volume:/data/db
-      - ./initializeReport.js:/docker-entrypoint-initdb.d/initialize.js:Z
-    networks:
-      - openrmf
-
-  scanhistorydb:
-    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
-    container_name: mongodb-scanhistory
-    restart: on-failure:5
-    ports:
-      - "27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
-      - MONGO_INITDB_DATABASE=openrmfscanhistory
-    volumes:
-      - scanhistory-data-volume:/data/db
-      - ./initializeScanHistory.js:/docker-entrypoint-initdb.d/initialize.js:Z
-    networks:
-      - openrmf
-
-  poamdb:
-    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
-    container_name: mongodb-poam
-    restart: on-failure:5
-    ports:
-      - "27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
-      - MONGO_INITDB_DATABASE=openrmfpoam
-    volumes:
-      - poam-data-volume:/data/db
-      - ./initializePoam.js:/docker-entrypoint-initdb.d/initialize.js:Z
-    networks:
-      - openrmf
-
-  trivyscandb:
-    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
-    container_name: mongodb-trivyscan
-    restart: on-failure:5
-    ports:
-      - "27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
-      - MONGO_INITDB_DATABASE=openrmftrivyscan
-    volumes:
-      - trivyscan-data-volume:/data/db
-      - ./initializeTrivyscan.js:/docker-entrypoint-initdb.d/initialize.js:Z
-    networks:
-      - openrmf
-
-  tasksdb:
-    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
-    container_name: mongodb-tasks
-    restart: on-failure:5
-    ports:
-      - "27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
-      - MONGO_INITDB_DATABASE=openrmftasks
-    volumes:
-      - tasks-data-volume:/data/db
-      - ./initializeTasks.js:/docker-entrypoint-initdb.d/initialize.js:Z
-    networks:
-      - openrmf
-
-  inventorydb:
-    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
-    container_name: mongodb-inventory
-    restart: on-failure:5
-    ports:
-      - "27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
-      - MONGO_INITDB_DATABASE=openrmfinventory
-    volumes:
-      - inventory-data-volume:/data/db
-      - ./initializeInventory.js:/docker-entrypoint-initdb.d/initialize.js:Z
-    networks:
-      - openrmf
-
-  conmondb:
-    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
-    container_name: mongodb-conmon
-    restart: on-failure:5
-    ports:
-      - "27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
-      - MONGO_INITDB_DATABASE=openrmfconmon
-    volumes:
-      - conmon-data-volume:/data/db
-      - ./initializeConmon.js:/docker-entrypoint-initdb.d/initialize.js:Z
-    networks:
-      - openrmf
-
-  scanwatchdb:
-    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
-    container_name: mongodb-scanwatch
-    restart: on-failure:5
-    ports:
-      - "27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
-      - MONGO_INITDB_DATABASE=openrmfscanwatch
-    volumes:
-      - scanwatch-data-volume:/data/db
-      - ./initializeScanwatch.js:/docker-entrypoint-initdb.d/initialize.js:Z
-    networks:
-      - openrmf
-
-  journaldb:
-    image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
-    container_name: mongodb-journal
-    restart: on-failure:5
-    ports:
-      - "27017"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=myp2ssw0rd
-      - MONGO_INITDB_DATABASE=openrmfjournal
-    volumes:
-      - journal-data-volume:/data/db
-      - ./initializeJournal.js:/docker-entrypoint-initdb.d/initialize.js:Z
-    networks:
-      - openrmf
-
 ### NATS messaging container (internal)
   natsserver: 
     image: docker.io/nats:2.12.8-alpine3.22
@@ -849,19 +645,7 @@ services:
 
 ### put all the volume listings here for persistent data
 volumes:
-  template-data-volume:
-  checklist-data-volume:
-  score-data-volume:
-  audit-data-volume:
-  report-data-volume:
-  scanhistory-data-volume:
-  poam-data-volume:
-  journal-data-volume:
-  scanwatch-data-volume:
-  conmon-data-volume:
-  inventory-data-volume:
-  tasks-data-volume:
-  trivyscan-data-volume:
+  mongo-data-volume:
   trivyscan-cache-volume:
   trivyscan-target-volume:
   # NFS-backed scan target: the Docker host kernel mounts the export (no
