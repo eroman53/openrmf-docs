@@ -1,15 +1,12 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8">
 <style>
-  @media print { @page { size: 1660px 4600px; margin: 14px; } body { padding: 20px 24px; } }
+  @media print { @page { size: 1660px 4900px; margin: 14px; } body { padding: 20px 24px; } }
   .frame { max-width: 1600px !important; }
   .scroller { overflow: visible !important; }
   .scroller svg { min-width: 1560px !important; }
 </style>
-</head>
-<body>
+</head><body>
 <title>STOOGE — Architecture & Ports/Protocols</title>
 <style>
   :root {
@@ -140,17 +137,44 @@
   <div class="eyebrow"><b>stooge</b> · stig tracking, oversight, and organizational governance engine · eroman53 openrmf fork · july 2026</div>
   <h1>Architecture &amp; Communication Ports / Protocols</h1>
   <p class="lede">Every box is a container on the internal <span class="mono">openrmf</span> Docker network. NGINX is the single
-    host-exposed entry point; the NATS bus is the service backbone; every service owns exactly one MongoDB. All fork-built
-    .NET services now run on the <b>UBI8 (RHEL&nbsp;8.10) base</b> with the DoD CA bundle. Teal marks fork additions/modifications.</p>
+    host-exposed entry point; the NATS bus is the service backbone; every service owns exactly one <b>logical database</b> on a
+    single consolidated MongoDB. All fork-built .NET services run on the <b>UBI8 (RHEL&nbsp;8.10) base</b> with the DoD CA bundle.
+    Teal marks fork additions/modifications.</p>
   <div class="counts">
-    <span><b>46</b> containers</span>
+    <span><b>34</b> containers</span>
     <span><b>15</b> HTTP services</span>
     <span><b>10</b> NATS listeners</span>
-    <span><b>13</b> Mongo DBs</span>
+    <span><b>1</b> Mongo container · 13 logical DBs</span>
     <span><b>1</b> host-exposed port (8080)</span>
     <span>UBI8 fork services</span>
   </div>
 </header>
+
+<div class="wrap" style="margin-bottom: 4px;">
+  <h2 style="margin-top: 30px;">Container footprint vs. upstream OpenRMF</h2>
+</div>
+<div class="wrap" style="background: var(--panel); border: 1px solid var(--faint); border-radius: 10px; padding: 18px 22px; margin-bottom: 8px;">
+  <div style="display:flex; flex-direction:column; gap:13px;">
+    <div style="display:grid; grid-template-columns: 210px 1fr 52px; align-items:center; gap:14px;">
+      <div style="font-size:13.5px;">Upstream OpenRMF OSS <span style="color:var(--muted);">(v1.14 stack)</span></div>
+      <div style="background:var(--chip); border-radius:5px; height:26px; position:relative;"><div style="background:var(--line); width:57%; height:100%; border-radius:5px;"></div></div>
+      <div style="font-variant-numeric:tabular-nums; font-weight:650;">27</div>
+    </div>
+    <div style="display:grid; grid-template-columns: 210px 1fr 52px; align-items:center; gap:14px;">
+      <div style="font-size:13.5px;">STOOGE fork <span style="color:var(--muted);">— as first built</span></div>
+      <div style="background:var(--chip); border-radius:5px; height:26px; position:relative;"><div style="background:var(--faint); border:1px solid var(--line); width:98%; height:100%; border-radius:5px;"></div></div>
+      <div style="font-variant-numeric:tabular-nums; font-weight:650;">46</div>
+    </div>
+    <div style="display:grid; grid-template-columns: 210px 1fr 52px; align-items:center; gap:14px;">
+      <div style="font-size:13.5px; font-weight:600;">STOOGE fork <span style="color:var(--accent-ink);">— Mongo-consolidated</span></div>
+      <div style="background:var(--chip); border-radius:5px; height:26px; position:relative;"><div style="background:var(--accent); width:72%; height:100%; border-radius:5px;"></div></div>
+      <div style="font-variant-numeric:tabular-nums; font-weight:680; color:var(--accent-ink);">34</div>
+    </div>
+  </div>
+  <p style="margin:14px 0 0; font-size:13px; color:var(--muted);">The fork adds <b>11 new microservices</b> (Scan History, POA&amp;M, Journal,
+    Scan Watch, ConMon, Inventory, Tasks, Trivy + their listeners) yet lands at only <b>+7 net containers</b> over stock OpenRMF —
+    consolidating the data tier from 13 Mongo containers to 1 absorbed the growth. Test-only Samba container excluded.</p>
+</div>
 
 <h2 class="wrap">1 · Container architecture</h2>
 <div class="legend">
@@ -342,7 +366,7 @@
 
   <!-- data band -->
   <rect x="60" y="560" width="1430" height="88" class="databand"/>
-  <text x="80" y="586" class="t">Data tier — 13 MongoDB instances <tspan class="tag">:27017</tspan> · one database per service (Ubuntu jammy)</text>
+  <text x="80" y="586" class="t">Data tier — 1 consolidated MongoDB <tspan class="tag">:27017</tspan> · 13 logical databases, one per service + per-DB users (Ubuntu jammy)</text>
   <text x="80" y="608" class="tag">checklistdb · scoredb · templatedb · auditdb · reportdb · scanhistorydb (GridFS + Findings + ScanHosts) · poamdb</text>
   <text x="80" y="624" class="tag">journaldb (GridFS evidence) · scanwatchdb · conmondb · inventorydb (assets + OS mappings) · tasksdb · trivyscandb</text>
 
@@ -428,7 +452,7 @@
     <tr><td>10 msg listeners (score · compliance · controls · template · system · audit · reports · poam · journal · inventory)</td><td>NATS</td><td class="mono">4222/tcp</td><td>NATS sub</td><td>Event-driven reconciliation, journaling, scoring, reporting</td><td><span class="dir int">internal</span></td></tr>
 
     <tr class="grp"><td colspan="6">Data tier</td></tr>
-    <tr><td>Each service</td><td>Its own MongoDB (13 instances)</td><td class="mono">27017/tcp</td><td>MongoDB wire</td><td>One database per service — no shared writes</td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>Each service</td><td>Consolidated MongoDB — own logical DB + user</td><td class="mono">27017/tcp</td><td>MongoDB wire</td><td>One database per service, isolated by per-DB credentials — no shared writes</td><td><span class="dir int">internal</span></td></tr>
     <tr><td>msg-poam · msg-reports · msg-journal · msg-inventory · ConMon · Inventory API</td><td>checklistdb · scanhistorydb · templatedb · poamdb</td><td class="mono">27017/tcp</td><td>MongoDB wire</td><td>Deliberate read-only cross-service views (findings, scan hosts, checklists, templates)</td><td><span class="dir int">internal</span></td></tr>
 
     <tr class="grp"><td colspan="6">Observability</td></tr>
@@ -440,10 +464,9 @@
 </div>
 
 <footer>
-  Sources: <span class="mono">openrmf-docs/scripts/docker-compose.yml</span> + <span class="mono">nginx.conf</span> as of the UBI8 rebase
+  Sources: <span class="mono">openrmf-docs/scripts/docker-compose.yml</span> + <span class="mono">nginx.conf</span> as of the MongoDB consolidation (2026-07-20) on top of the UBI8 rebase
   (2026-07-18). Ports verified against the live nginx upstream config; all fork images scan 0 CRITICAL / 1 accepted HIGH.
   This matrix doubles as the starting point for the Phase 2 automated PPSM module.
 </footer>
 
-</body>
-</html>
+</body></html>
