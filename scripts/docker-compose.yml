@@ -433,6 +433,10 @@ services:
       - POAMDB=openrmfpoam
       - TEMPLATEDBCONNECTION=mongodb://openrmftemplate:openrmf1234!@mongodb/openrmftemplate?authSource=openrmftemplate
       - TEMPLATEDB=openrmftemplate
+      # asset registry: canonical host identity for coverage reconciliation
+      # (optional -- coverage degrades to raw hostname matching if unset)
+      - INVENTORYDBCONNECTION=mongodb://openrmfinventory:openrmf1234!@mongodb/openrmfinventory?authSource=openrmfinventory
+      - INVENTORYDB=openrmfinventory
       - LOGLEVEL=3
     depends_on:
       - mongodb
