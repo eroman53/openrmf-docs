@@ -160,3 +160,16 @@ d.createCollection("JournalEntries");
 d.JournalEntries.createIndex({ systemGroupId: 1, created: -1 });
 d.JournalEntries.createIndex({ entityType: 1, entityId: 1, created: -1 });
 d.JournalEntries.createIndex({ created: -1 });
+
+// ---- openrmfnotify (fork: subscriptions + SMTP config + send log) ----
+d = db.getSiblingDB('openrmfnotify');
+d.createUser({ user: "openrmfnotify", pwd: "openrmf1234!", roles: [{ role: "readWrite", db: "openrmfnotify" }] });
+d.createCollection("NotifyConfig");
+d.createCollection("Subscriptions");
+d.Subscriptions.createIndex({ userid: 1 });
+d.Subscriptions.createIndex({ enabled: 1 });
+d.createCollection("NotificationLog");
+d.NotificationLog.createIndex({ subscriptionId: 1, eventKey: 1 });
+d.NotificationLog.createIndex({ subscriptionId: 1, status: 1 });
+d.NotificationLog.createIndex({ when: -1 });
+d.NotificationLog.createIndex({ userid: 1, when: -1 });

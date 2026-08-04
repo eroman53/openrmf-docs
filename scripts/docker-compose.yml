@@ -366,6 +366,36 @@ services:
     networks:
       - openrmf
 
+  openrmfsvc-notify:
+    image: eroman53/openrmf-svc-notify:latest
+    container_name: openrmf-notify
+    restart: on-failure:5
+    ports:
+      - "8116"
+    env_file: .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://*:8116
+      - DBCONNECTION=mongodb://openrmfnotify:openrmf1234!@mongodb/openrmfnotify?authSource=openrmfnotify
+      - DB=openrmfnotify
+      - DBTYPE=mongo
+      - NATSSERVERURL=nats://natsserver:4222
+      # checklist DB: resolve artifact->system + read package RBAC grants
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDB=openrmf
+      # ConMon posture for the weekly digest (service-account call bypasses RBAC)
+      - CONMONAPIURL=http://openrmfapi-conmon:8108
+      - KEYCLOAKTOKENURL=http://openrmf-keycloak:8080/auth/realms/openrmf/protocol/openid-connect/token
+      - CLIENTID=openrmf-scanwatch
+      - CLIENTSECRET=${SCANWATCH_CLIENTSECRET}
+      - LOGLEVEL=2
+    depends_on:
+      - mongodb
+      - natsserver
+      - openrmfapi-conmon
+    networks:
+      - openrmf
+
   openrmfapi-tasks:
     image: eroman53/openrmf-api-tasks:latest
     container_name: openrmf-tasks-api
