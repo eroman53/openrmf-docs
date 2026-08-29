@@ -78,6 +78,9 @@ services:
       - DB=openrmf
       - DBTYPE=mongo
       - SCANHISTORYAPIURL=http://openrmfapi-scanhistory:8100
+      # report DB (read-only): vulnerability full-text search
+      - REPORTDBCONNECTION=mongodb://openrmfreport:openrmf1234!@mongodb/openrmfreport?authSource=openrmfreport
+      - REPORTDB=openrmfreport
       - LOGLEVEL=3
     depends_on:
       - mongodb
