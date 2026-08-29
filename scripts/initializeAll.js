@@ -21,6 +21,9 @@ d.SystemGroups.createIndex({ title: 1 });
 d.SystemGroups.createIndex({ created: -1 });
 d.SystemGroups.createIndex({ updatedOn: -1 });
 d.SystemGroups.createIndex({ numberOfChecklists: 1 });
+// full-text search (Phase 1)
+d.Artifacts.createIndex({ hostName: "text", stigType: "text", systemTitle: "text" }, { name: "ft_search" });
+d.SystemGroups.createIndex({ title: "text", description: "text" }, { name: "ft_search" });
 
 // ---- openrmfscore ----
 d = db.getSiblingDB('openrmfscore');
@@ -96,6 +99,8 @@ d.VulnerabilityReport.createIndex({ severityOverride: 1 });
 d.VulnerabilityReport.createIndex({ systemGroupId: 1 });
 d.VulnerabilityReport.createIndex({ artifactId: 1 });
 d.VulnerabilityReport.createIndex({ severity: 1 });
+// full-text search (Phase 1)
+d.VulnerabilityReport.createIndex({ ruleTitle: "text", vulnid: "text", hostname: "text", discussion: "text", cciReferences: "text", securityControlNumbers: "text" }, { name: "ft_search" });
 
 // ---- openrmfscanhistory (fork: GridFS scan storage + delta findings) ----
 d = db.getSiblingDB('openrmfscanhistory');
