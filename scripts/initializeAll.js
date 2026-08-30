@@ -111,6 +111,17 @@ d.ScanFiles.createIndex({ created: -1 });
 d.createCollection("Findings");
 d.Findings.createIndex({ systemGroupId: 1, scanType: 1, status: 1 });
 d.Findings.createIndex({ systemGroupId: 1, scanType: 1, hostname: 1, pluginId: 1 });
+d.createCollection("ScanHosts");
+d.ScanHosts.createIndex({ systemGroupId: 1, scanType: 1, hostname: 1 });
+d.createCollection("ScanPorts");
+d.ScanPorts.createIndex({ systemGroupId: 1, hostname: 1, port: 1, protocol: 1 });
+
+// ---- openrmfppsm (fork: ports/protocols/services registry) ----
+d = db.getSiblingDB('openrmfppsm');
+d.createUser({ user: "openrmfppsm", pwd: "openrmf1234!", roles: [{ role: "readWrite", db: "openrmfppsm" }] });
+d.createCollection("PpsmEntries");
+d.PpsmEntries.createIndex({ systemGroupId: 1, port: 1, protocol: 1 });
+d.PpsmEntries.createIndex({ systemGroupId: 1, status: 1 });
 
 // ---- openrmfpoam (fork) ----
 d = db.getSiblingDB('openrmfpoam');

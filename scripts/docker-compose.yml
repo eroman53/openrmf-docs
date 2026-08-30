@@ -420,6 +420,30 @@ services:
     networks:
       - openrmf
 
+  openrmfapi-ppsm:
+    image: eroman53/openrmf-api-ppsm:latest
+    container_name: openrmf-ppsm-api
+    restart: on-failure:5
+    ports:
+      - "8114"
+    env_file: .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://*:8114
+      - DBCONNECTION=mongodb://openrmfppsm:openrmf1234!@mongodb/openrmfppsm?authSource=openrmfppsm
+      - DB=openrmfppsm
+      - DBTYPE=mongo
+      # read-only cross-service view of scan-observed open ports for reconciliation
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDB=openrmf
+      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
+      - SCANHISTORYDB=openrmfscanhistory
+      - LOGLEVEL=3
+    depends_on:
+      - mongodb
+    networks:
+      - openrmf
+
   openrmfapi-inventory:
     image: eroman53/openrmf-api-inventory:latest
     container_name: openrmf-inventory-api
