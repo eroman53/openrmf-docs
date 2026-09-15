@@ -2,14 +2,30 @@
  * STOOGE brand layer for the Keycloak login pages.
  * Additive only: the parent (openrmf) theme supplies the layout, this file
  * swaps the wordmark, the accent color, and the favicon.
+ *
+ * Light and dark are both first-class here. The base template applies
+ * .pf-v5-theme-dark from the OS setting (darkMode=true in theme.properties),
+ * and js/stooge-theme-toggle.js lets a person override that per browser.
  */
 
 :root {
     --stooge-brand: #d63a22;
     --stooge-brand-dark: #b32f1b;
+    /* the flat brand red is too low-contrast on a dark ground */
+    --stooge-brand-light: #ef6a52;
     --stooge-ink: #0e1116;
+    --stooge-paper: #eef2f7;
+
     /* the rule above the login card */
     --keycloak-card-top-color: var(--stooge-brand);
+    --stooge-logo: url("../img/stooge-logo-horizontal.svg");
+    --stooge-link: var(--stooge-brand);
+}
+
+/* the wordmark ships in two cuts; swap the whole asset, not its colors */
+.pf-v5-theme-dark {
+    --stooge-logo: url("../img/stooge-logo-horizontal-darkbg.svg");
+    --stooge-link: var(--stooge-brand-light);
 }
 
 /*
@@ -33,14 +49,21 @@
 #kc-header-wrapper::before {
     content: "";
     display: block;
-    width: 250px;
-    height: 110px;
+    width: 320px;
+    height: 140px;
     margin: 0 auto;
-    background: url("../img/stooge-logo-horizontal.svg") no-repeat center;
+    background: var(--stooge-logo) no-repeat center;
     background-size: contain;
 }
 
-/* primary actions (Sign In, Submit) in the brand red */
+@media (max-width: 480px) {
+    #kc-header-wrapper::before {
+        width: 240px;
+        height: 105px;
+    }
+}
+
+/* primary actions (Sign In, Submit) in the brand red, both appearances */
 .pf-v5-c-button.pf-m-primary {
     --pf-v5-c-button--m-primary--BackgroundColor: var(--stooge-brand);
     --pf-v5-c-button--m-primary--hover--BackgroundColor: var(--stooge-brand-dark);
@@ -53,13 +76,51 @@
 #kc-info a,
 #kc-registration a,
 .kc-login-tooltip a {
-    color: var(--stooge-brand);
+    color: var(--stooge-link);
 }
 
 .pf-v5-c-button.pf-m-link:hover,
 #kc-info a:hover,
 #kc-registration a:hover {
     color: var(--stooge-brand-dark);
+}
+
+.pf-v5-theme-dark .pf-v5-c-button.pf-m-link:hover,
+.pf-v5-theme-dark #kc-info a:hover,
+.pf-v5-theme-dark #kc-registration a:hover {
+    color: var(--stooge-paper);
+}
+
+/* appearance switch, injected by js/stooge-theme-toggle.js */
+#stooge-theme-toggle {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 100;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 4px;
+    border: 1px solid rgba(14, 17, 22, 0.25);
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--stooge-ink);
+}
+
+#stooge-theme-toggle:hover,
+#stooge-theme-toggle:focus-visible {
+    border-color: var(--stooge-brand);
+    outline: none;
+}
+
+.pf-v5-theme-dark #stooge-theme-toggle {
+    border-color: rgba(238, 242, 247, 0.30);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--stooge-paper);
 }
 
 /*
