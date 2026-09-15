@@ -349,6 +349,9 @@ services:
       - ASPNETCORE_URLS=http://*:8114
       - DBCONNECTION=mongodb://openrmftrivyscan:openrmf1234!@mongodb/openrmftrivyscan?authSource=openrmftrivyscan
       - DB=openrmftrivyscan
+      # read-only view of the checklist DB so the API can enforce package-level RBAC
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDB=openrmf
       - SCANHISTORYAPIURL=http://openrmfapi-scanhistory:8100
       - KEYCLOAKTOKENURL=http://openrmf-keycloak:8080/auth/realms/openrmf/protocol/openid-connect/token
       - CLIENTID=openrmf-scanwatch
