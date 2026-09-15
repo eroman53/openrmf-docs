@@ -436,6 +436,10 @@ services:
       - DBCONNECTION=mongodb://openrmfoscal:REDACTED@mongodb/openrmfoscal?authSource=openrmfoscal
       - DB=openrmfoscal
       - DBTYPE=mongo
+      # read-only view of the checklist DB: the per-system profile endpoints are
+      # package-scoped and enforce the usual package RBAC grants
+      - SYSTEMDBCONNECTION=mongodb://openrmf:REDACTED@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDB=openrmf
       - LOGLEVEL=3
     depends_on:
       - mongodb

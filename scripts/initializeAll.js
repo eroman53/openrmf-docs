@@ -135,6 +135,8 @@ d.CciItems.createIndex({ cci: 1 });
 // array-field indexes: one CCI can map to several controls
 d.CciItems.createIndex({ "rev5Mappings.controlId": 1 });
 d.CciItems.createIndex({ "rev4Mappings.controlId": 1 });
+d.createCollection("SystemProfiles");
+d.SystemProfiles.createIndex({ systemGroupId: 1 }, { unique: true });
 
 // ---- openrmfpoam (fork) ----
 d = db.getSiblingDB('openrmfpoam');
