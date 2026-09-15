@@ -423,6 +423,25 @@ services:
     networks:
       - openrmf
 
+  openrmfapi-oscal:
+    image: eroman53/openrmf-api-oscal:latest
+    container_name: openrmf-oscal-api
+    restart: on-failure:5
+    ports:
+      - "8116"
+    env_file: .env
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://*:8116
+      - DBCONNECTION=mongodb://openrmfoscal:REDACTED@mongodb/openrmfoscal?authSource=openrmfoscal
+      - DB=openrmfoscal
+      - DBTYPE=mongo
+      - LOGLEVEL=3
+    depends_on:
+      - mongodb
+    networks:
+      - openrmf
+
   openrmfapi-ppsm:
     image: eroman53/openrmf-api-ppsm:latest
     container_name: openrmf-ppsm-api

@@ -123,6 +123,19 @@ d.createCollection("PpsmEntries");
 d.PpsmEntries.createIndex({ systemGroupId: 1, port: 1, protocol: 1 });
 d.PpsmEntries.createIndex({ systemGroupId: 1, status: 1 });
 
+// ---- openrmfoscal (fork: 800-53 catalog + DISA CCI mapping, Phase 3) ----
+d = db.getSiblingDB('openrmfoscal');
+d.createUser({ user: "openrmfoscal", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmfoscal" }] });
+d.createCollection("Controls");
+d.Controls.createIndex({ controlId: 1 });
+d.Controls.createIndex({ family: 1 });
+d.Controls.createIndex({ sortId: 1 });
+d.createCollection("CciItems");
+d.CciItems.createIndex({ cci: 1 });
+// array-field indexes: one CCI can map to several controls
+d.CciItems.createIndex({ "rev5Mappings.controlId": 1 });
+d.CciItems.createIndex({ "rev4Mappings.controlId": 1 });
+
 // ---- openrmfpoam (fork) ----
 d = db.getSiblingDB('openrmfpoam');
 d.createUser({ user: "openrmfpoam", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmfpoam" }] });
