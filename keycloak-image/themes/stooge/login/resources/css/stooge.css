@@ -18,7 +18,7 @@
 
     /* the rule above the login card */
     --keycloak-card-top-color: var(--stooge-brand);
-    --stooge-logo: url("../img/stooge-logo-horizontal.svg");
+    --stooge-logo: url("../img/stooge-logo-horizontal.svg?v=2");
     --stooge-link: var(--stooge-brand);
 
     /* background: light appearance */
@@ -35,7 +35,7 @@
 
 /* the wordmark ships in two cuts; swap the whole asset, not its colors */
 .pf-v5-theme-dark {
-    --stooge-logo: url("../img/stooge-logo-horizontal-darkbg.svg");
+    --stooge-logo: url("../img/stooge-logo-horizontal-darkbg.svg?v=2");
     --stooge-link: var(--stooge-brand-light);
 
     /* background: dark appearance */
@@ -70,7 +70,7 @@
     background-color: var(--stooge-bg-2);
     background-image:
         radial-gradient(1100px 620px at 50% 8%, var(--stooge-bg-glow), transparent 68%),
-        url("../img/cyber-topology.svg"),
+        url("../img/cyber-topology.svg?v=2"),
         repeating-radial-gradient(circle at 18% 88%,
             transparent 0 128px, var(--stooge-ring) 128px 129px, transparent 129px 258px),
         repeating-linear-gradient(0deg, var(--stooge-grid) 0 1px, transparent 1px 54px),
