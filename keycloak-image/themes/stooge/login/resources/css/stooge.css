@@ -20,12 +20,123 @@
     --keycloak-card-top-color: var(--stooge-brand);
     --stooge-logo: url("../img/stooge-logo-horizontal.svg");
     --stooge-link: var(--stooge-brand);
+
+    /* background: light appearance */
+    --stooge-bg-1: #f5f8fb;
+    --stooge-bg-2: #dbe3ec;
+    --stooge-bg-glow: rgba(214, 58, 34, 0.05);
+    --stooge-grid: rgba(43, 61, 81, 0.055);
+    --stooge-ring: rgba(214, 58, 34, 0.085);
+    --stooge-beam-hot: rgba(214, 58, 34, 0.10);
+    --stooge-beam-soft: rgba(214, 58, 34, 0.028);
+    --stooge-mesh-opacity: 0.85;
+    --stooge-card-shadow: 0 18px 46px rgba(14, 17, 22, 0.16);
 }
 
 /* the wordmark ships in two cuts; swap the whole asset, not its colors */
 .pf-v5-theme-dark {
     --stooge-logo: url("../img/stooge-logo-horizontal-darkbg.svg");
     --stooge-link: var(--stooge-brand-light);
+
+    /* background: dark appearance */
+    --stooge-bg-1: #131a23;
+    --stooge-bg-2: #070a0e;
+    --stooge-bg-glow: rgba(214, 58, 34, 0.10);
+    --stooge-grid: rgba(150, 175, 200, 0.05);
+    --stooge-ring: rgba(214, 58, 34, 0.13);
+    --stooge-beam-hot: rgba(214, 58, 34, 0.15);
+    --stooge-beam-soft: rgba(214, 58, 34, 0.04);
+    --stooge-mesh-opacity: 1;
+    --stooge-card-shadow: 0 18px 46px rgba(0, 0, 0, 0.55);
+}
+
+/*
+ * ---------- background ----------
+ *
+ * A monitored network under a sweeping beacon, which is what the product does
+ * and what the lighthouse mark says. Four layers, cheapest last:
+ *
+ *   1. a warm glow behind the wordmark, tying the page to the brand red
+ *   2. cyber-topology.svg -- the node/link mesh (generated; see
+ *      keycloak-image/tools/cyber-topology.gen.awk)
+ *   3. beacon rings and a telemetry grid, both pure gradients
+ *   4. the base wash
+ *
+ * The rings and the rotating sweep (body::before) share one anchor point, so
+ * they stay aligned whatever the viewport aspect ratio. Everything is local to
+ * the theme: no external fonts, scripts, or images.
+ */
+.login-pf body {
+    background-color: var(--stooge-bg-2);
+    background-image:
+        radial-gradient(1100px 620px at 50% 8%, var(--stooge-bg-glow), transparent 68%),
+        url("../img/cyber-topology.svg"),
+        repeating-radial-gradient(circle at 18% 88%,
+            transparent 0 128px, var(--stooge-ring) 128px 129px, transparent 129px 258px),
+        repeating-linear-gradient(0deg, var(--stooge-grid) 0 1px, transparent 1px 54px),
+        repeating-linear-gradient(90deg, var(--stooge-grid) 0 1px, transparent 1px 54px),
+        linear-gradient(165deg, var(--stooge-bg-1), var(--stooge-bg-2));
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat;
+    background-size: cover, cover, cover, auto, auto, cover;
+    background-position: center, center, center, center, center, center;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+/*
+ * The beacon sweep: a conic gradient centred on the ring anchor, rotated as a
+ * whole so the beam travels around that point.
+ *
+ * The element has to reach the far corner in every direction, because the beam
+ * sweeps the full circle and a smaller box would clip it mid-travel. From an
+ * anchor this close to a corner that works out near 1.2 viewports of radius,
+ * hence the size. It is one gradient on one element, animated with transform
+ * only, so it composites rather than repainting per frame.
+ */
+.login-pf body::before {
+    content: "";
+    position: fixed;
+    left: 18%;
+    top: 88%;
+    width: 250vmax;
+    height: 250vmax;
+    margin: -125vmax 0 0 -125vmax;
+    background: conic-gradient(from 0deg,
+        var(--stooge-beam-hot) 0deg,
+        var(--stooge-beam-soft) 9deg,
+        transparent 22deg,
+        transparent 338deg,
+        var(--stooge-beam-soft) 352deg,
+        var(--stooge-beam-hot) 360deg);
+    animation: stooge-sweep 24s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes stooge-sweep {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* a still beam for anyone who asks the OS for less movement */
+@media (prefers-reduced-motion: reduce) {
+    .login-pf body::before {
+        animation: none;
+        transform: rotate(-38deg);
+    }
+}
+
+/* keep the card and header above the background layers */
+.pf-v5-c-login,
+.login-pf body > .pf-v5-c-login {
+    position: relative;
+    z-index: 1;
+}
+
+/* the card now floats over artwork, so give it a real edge */
+.pf-v5-c-login__main {
+    box-shadow: var(--stooge-card-shadow);
 }
 
 /*
