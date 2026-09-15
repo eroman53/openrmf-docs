@@ -17,6 +17,8 @@ ENV KC_DB=postgres
 WORKDIR /opt/keycloak
 # Add the theme and welcome page setup
 COPY ./themes/openrmf/ /opt/keycloak/themes/openrmf/
+# STOOGE fork branding (login/account/admin/welcome); inherits the above
+COPY ./themes/stooge/ /opt/keycloak/themes/stooge/
 RUN /opt/keycloak/bin/kc.sh build --spi-x509cert-lookup-provider=nginx
 
 FROM quay.io/keycloak/keycloak:26.5.7

@@ -680,11 +680,13 @@ services:
 
   keycloak: 
     container_name: openrmf-keycloak
-    image: docker.io/cingulara/keycloak-openrmf:26.5.7
+    # fork image: upstream keycloak-openrmf plus the STOOGE theme
+    #   docker build -t eroman53/keycloak-stooge:26.5.7 ../keycloak-image
+    image: eroman53/keycloak-stooge:26.5.7
     restart: on-failure:10
     command:
       - start
-      - --spi-theme-welcome-theme=openrmf
+      - --spi-theme-welcome-theme=stooge
     ports:
       - "8080"
     environment:
