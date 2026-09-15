@@ -1,0 +1,69 @@
+/*
+ * STOOGE brand layer for the Keycloak login pages.
+ * Additive only: the parent (openrmf) theme supplies the layout, this file
+ * swaps the wordmark, the accent color, and the favicon.
+ */
+
+:root {
+    --stooge-brand: #d63a22;
+    --stooge-brand-dark: #b32f1b;
+    --stooge-ink: #0e1116;
+    /* the rule above the login card */
+    --keycloak-card-top-color: var(--stooge-brand);
+}
+
+/*
+ * The parent theme places an OpenRMF <img> above the card from login.ftl, but
+ * only on the login page. Hide it and brand the page header instead, which
+ * every page in the flow renders (reset password, OTP, update profile...).
+ */
+.openrmfoss-logo {
+    display: none;
+}
+
+#kc-header-wrapper {
+    /* the realm display name renders here as text; the wordmark replaces it */
+    display: flex;
+    justify-content: center;
+    font-size: 0;
+    line-height: 0;
+    padding: 0;
+}
+
+#kc-header-wrapper::before {
+    content: "";
+    display: block;
+    width: 250px;
+    height: 110px;
+    margin: 0 auto;
+    background: url("../img/stooge-logo-horizontal.svg") no-repeat center;
+    background-size: contain;
+}
+
+/* primary actions (Sign In, Submit) in the brand red */
+.pf-v5-c-button.pf-m-primary {
+    --pf-v5-c-button--m-primary--BackgroundColor: var(--stooge-brand);
+    --pf-v5-c-button--m-primary--hover--BackgroundColor: var(--stooge-brand-dark);
+    --pf-v5-c-button--m-primary--focus--BackgroundColor: var(--stooge-brand-dark);
+    --pf-v5-c-button--m-primary--active--BackgroundColor: var(--stooge-brand-dark);
+}
+
+/* links (forgot password, register) pick up the brand rather than PF blue */
+.pf-v5-c-button.pf-m-link,
+#kc-info a,
+#kc-registration a,
+.kc-login-tooltip a {
+    color: var(--stooge-brand);
+}
+
+.pf-v5-c-button.pf-m-link:hover,
+#kc-info a:hover,
+#kc-registration a:hover {
+    color: var(--stooge-brand-dark);
+}
+
+/*
+ * The parent's login.ftl <img> is hidden above, but the browser still fetches
+ * it; themes/stooge/login/resources/img/logo.png overrides the inherited
+ * OpenRMF raster so no upstream artwork is served from this theme.
+ */
