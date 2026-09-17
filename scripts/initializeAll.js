@@ -137,6 +137,9 @@ d.CciItems.createIndex({ "rev5Mappings.controlId": 1 });
 d.CciItems.createIndex({ "rev4Mappings.controlId": 1 });
 d.createCollection("SystemProfiles");
 d.SystemProfiles.createIndex({ systemGroupId: 1 }, { unique: true });
+d.createCollection("ComplianceStatements");
+d.ComplianceStatements.createIndex({ systemGroupId: 1, controlId: 1 }, { unique: true });
+d.ComplianceStatements.createIndex({ assessmentDate: 1 });
 
 // ---- openrmfpoam (fork) ----
 d = db.getSiblingDB('openrmfpoam');
