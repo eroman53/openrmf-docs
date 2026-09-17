@@ -16,7 +16,14 @@ If you are upgrading from a version 1.8.x or earlier of OpenRMF<sup>&reg;</sup> 
 > Tested with Docker Desktop 2.x onward with 6 CPUs, 8 GB RAM, 1 GB swap and 60 GB Disk Image. You will want more than the default 2 CPU and 2 GB RAM to maximize the use of OpenRMF<sup>&reg;</sup> OSS specifically. Your machine age and hardware will make this vary some. If you see timeouts on Keycloak and OpenRMF<sup>&reg;</sup> OSS when uploading, running reports, or web UI screens taking a long time to load you may want to check the Docker Desktop Resources of your machine.
 
 ## Step 1 - Setup your .env file
-To run OpenRMF<sup>&reg;</sup> OSS you need to edit your `.env` file and replace the `xxx.xxx.xxx.xxx` with your IP address or DNS name of your host machine. Then save and exit. 
+In this fork `.env` is not tracked by git, because it holds per-deployment values and a client secret. Copy the template first:
+
+```
+cd scripts
+cp .env.example .env
+```
+
+Then edit `.env` and replace the `xxx.xxx.xxx.xxx` with your IP address or DNS name of your host machine. If you use the scan-watch or Trivy services, also fill in `SCANWATCH_CLIENTSECRET` from Keycloak. Then save and exit. 
 
 > *_DO NOT USE `localhost` or `127.0.0.1` because in containerland, that means "yourself"._*
 
