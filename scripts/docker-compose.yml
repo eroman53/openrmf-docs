@@ -520,6 +520,10 @@ services:
       # (optional -- coverage degrades to raw hostname matching if unset)
       - INVENTORYDBCONNECTION=mongodb://openrmfinventory:REDACTED@mongodb/openrmfinventory?authSource=openrmfinventory
       - INVENTORYDB=openrmfinventory
+      # 800-53 control assessment: which controls are overdue, unscheduled or
+      # never assessed (optional -- posture reports "not configured" if unset)
+      - OSCALDBCONNECTION=mongodb://openrmfoscal:REDACTED@mongodb/openrmfoscal?authSource=openrmfoscal
+      - OSCALDB=openrmfoscal
       - LOGLEVEL=3
     depends_on:
       - mongodb
