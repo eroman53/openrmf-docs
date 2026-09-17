@@ -19,3 +19,6 @@ docs/.jekyll-cache/*
 scripts/ssl/certs/*.crt
 
 scripts/ssl/private/*.key
+scripts/.env
+
+openrmf.code-workspace
