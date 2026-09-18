@@ -5,7 +5,18 @@
 # Build with the ca-root folder as context:
 #   docker build -f base-container-image-ubi/Dockerfile -t eroman53/openrmf-base-ubi:8.10 base-container-image
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.10
-RUN microdnf update -y \
+
+# PATCH_EPOCH exists only to defeat Docker's layer cache. Without it this RUN
+# is cached indefinitely and every later "rebuild" ships the package versions
+# from the day the layer was first built, silently. The same flaw was found
+# live in the web image on 2026-09-17, where a cached layer carried 27 HIGH
+# findings that were all fixed upstream. Nothing was being masked here at the
+# time (RHEL had published no fixes for the 8 findings this base carries), but
+# the exposure is identical, so the busting argument belongs here too. The
+# build scripts pass the date.
+ARG PATCH_EPOCH=unset
+RUN echo "OS patch epoch: $PATCH_EPOCH" \
+ && microdnf update -y \
  && microdnf install -y ca-certificates libicu libstdc++ krb5-libs openssl-libs zlib shadow-utils \
  && microdnf clean all
 # DoD CA root/intermediate bundle into the RHEL trust store
