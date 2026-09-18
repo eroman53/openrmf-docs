@@ -428,11 +428,11 @@ services:
     container_name: openrmf-oscal-api
     restart: on-failure:5
     ports:
-      - "8116"
+      - "8120"
     env_file: .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://*:8116
+      - ASPNETCORE_URLS=http://*:8120
       - DBCONNECTION=mongodb://openrmfoscal:REDACTED@mongodb/openrmfoscal?authSource=openrmfoscal
       - DB=openrmfoscal
       - DBTYPE=mongo
@@ -451,11 +451,11 @@ services:
     container_name: openrmf-ppsm-api
     restart: on-failure:5
     ports:
-      - "8114"
+      - "8118"
     env_file: .env
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://*:8114
+      - ASPNETCORE_URLS=http://*:8118
       - DBCONNECTION=mongodb://openrmfppsm:REDACTED@mongodb/openrmfppsm?authSource=openrmfppsm
       - DB=openrmfppsm
       - DBTYPE=mongo
