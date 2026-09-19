@@ -624,6 +624,10 @@ services:
 
 ### Metrics
   natspromexporter: 
+    # Observability. Not needed for functional work, so it is opt-in:
+    #   docker compose --profile metrics up -d
+    profiles:
+      - metrics
     image: docker.io/natsio/prometheus-nats-exporter:0.19.2
     container_name: nats-prometheus-exporter
     command: -varz -connz -subz http://natsserver:8222
@@ -634,6 +638,10 @@ services:
       - openrmf
 
   nats-client-metrics: 
+    # Observability. Not needed for functional work, so it is opt-in:
+    #   docker compose --profile metrics up -d
+    profiles:
+      - metrics
     image: docker.io/cingulara/nats-client-metrics:2.1.3
     container_name: nats-client-metrics
     restart: on-failure:5
@@ -647,6 +655,10 @@ services:
       - openrmf
 
   nginx-metrics: 
+    # Observability. Not needed for functional work, so it is opt-in:
+    #   docker compose --profile metrics up -d
+    profiles:
+      - metrics
     image: docker.io/nginx/nginx-prometheus-exporter:1.5.1
     container_name: nginx-metrics
     restart: on-failure:1000
@@ -662,6 +674,10 @@ services:
       - openrmf
 
   prometheus:
+    # Observability. Not needed for functional work, so it is opt-in:
+    #   docker compose --profile metrics up -d
+    profiles:
+      - metrics
     image: docker.io/prom/prometheus:v3.10.0
     container_name: prometheus
     command:
@@ -677,6 +693,10 @@ services:
       - openrmf
 
   grafana: 
+    # Observability. Not needed for functional work, so it is opt-in:
+    #   docker compose --profile metrics up -d
+    profiles:
+      - metrics
     image: docker.io/grafana/grafana:11.6.13-ubuntu
     container_name: grafana
     env_file: .grafana
