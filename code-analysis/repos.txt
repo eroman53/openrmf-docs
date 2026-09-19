@@ -5,6 +5,9 @@
 # openrmf-api-controls) and the superseded pre-v1.8 split services
 # (openrmf-api-upload, openrmf-api-save) are deliberately absent: we do not edit
 # them, so analyzing them would report other people's debt as ours.
+#
+# openrmf-msg-inventory, -journal, -poam and -reports were merged into
+# openrmf-msg-hub on 2026-09-19 and are no longer built or deployed.
 openrmf-api-conmon
 openrmf-api-inventory
 openrmf-api-journal
@@ -14,10 +17,7 @@ openrmf-api-ppsm
 openrmf-api-read
 openrmf-api-scanhistory
 openrmf-api-tasks
-openrmf-msg-inventory
-openrmf-msg-journal
-openrmf-msg-poam
-openrmf-msg-reports
+openrmf-msg-hub
 openrmf-svc-notify
 openrmf-svc-scanwatch
 openrmf-svc-trivy

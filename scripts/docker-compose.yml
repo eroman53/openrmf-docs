@@ -281,6 +281,49 @@ services:
     networks:
       - openrmf
 
+  # One host for the inventory, journal, POA&M and report listeners. They were
+  # four containers subscribing to an overlapping set of subjects, so a single
+  # checklist save was delivered four times and the same artifact was read out
+  # of Mongo four times. See openrmf-msg-hub/README.md.
+  #
+  # Every variable below is carried over verbatim from the four services this
+  # replaces: each module still connects to its own database with its own
+  # credentials.
+  openrmfmsg-hub:
+    image: eroman53/openrmf-msg-hub:latest
+    container_name: openrmf-message-hub
+    restart: on-failure:5
+    environment:
+      # shared: the checklist/system database every module reads
+      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDB=openrmf
+      - SYSTEMDBTYPE=mongo
+      # inventory module
+      - INVENTORYDBCONNECTION=mongodb://openrmfinventory:openrmf1234!@mongodb/openrmfinventory?authSource=openrmfinventory
+      - INVENTORYDB=openrmfinventory
+      # journal module
+      - JOURNALDBCONNECTION=mongodb://openrmfjournal:openrmf1234!@mongodb/openrmfjournal?authSource=openrmfjournal
+      - JOURNALDB=openrmfjournal
+      # POA&M module
+      - POAMDBCONNECTION=mongodb://openrmfpoam:openrmf1234!@mongodb/openrmfpoam?authSource=openrmfpoam
+      - POAMDB=openrmfpoam
+      # reports module
+      - REPORTDBCONNECTION=mongodb://openrmfreport:openrmf1234!@mongodb/openrmfreport?authSource=openrmfreport
+      - REPORTDB=openrmfreport
+      - REPORTDBTYPE=mongo
+      # shared by inventory, POA&M and reports
+      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
+      - SCANHISTORYDB=openrmfscanhistory
+      - NATSSERVERURL=nats://natsserver:4222
+      - LOGLEVEL=3
+      # LOGLEVEL=2 (Info) additionally logs, per message, how many artifact reads
+      # the modules shared -- the measure of what merging them actually bought.
+    depends_on:
+      - mongodb
+      - natsserver
+    networks:
+      - openrmf
+
   openrmfmsg-audit:
     image: docker.io/cingulara/openrmf-msg-audit:1.14.01
     container_name: openrmf-audit-nats-message-client
@@ -289,46 +332,6 @@ services:
       - DBCONNECTION=mongodb://openrmfaudit:openrmf1234!@mongodb/openrmfaudit?authSource=openrmfaudit
       - DB=openrmfaudit
       - DBTYPE=mongo
-      - NATSSERVERURL=nats://natsserver:4222
-      - LOGLEVEL=3
-    depends_on:
-      - mongodb
-      - natsserver
-    networks:
-      - openrmf
-
-  openrmfmsg-reports:
-    image: eroman53/openrmf-msg-reports:latest
-    container_name: openrmf-report-nats-message-client
-    restart: on-failure:5
-    environment:
-      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
-      - SYSTEMDB=openrmf
-      - SYSTEMDBTYPE=mongo
-      - REPORTDBCONNECTION=mongodb://openrmfreport:openrmf1234!@mongodb/openrmfreport?authSource=openrmfreport
-      - REPORTDB=openrmfreport
-      - REPORTDBTYPE=mongo
-      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
-      - SCANHISTORYDB=openrmfscanhistory
-      - NATSSERVERURL=nats://natsserver:4222
-      - LOGLEVEL=3
-    depends_on:
-      - mongodb
-      - natsserver
-    networks:
-      - openrmf
-
-  openrmfmsg-poam:
-    image: eroman53/openrmf-msg-poam:latest
-    container_name: openrmf-poam-nats-message-client
-    restart: on-failure:5
-    environment:
-      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
-      - SYSTEMDB=openrmf
-      - POAMDBCONNECTION=mongodb://openrmfpoam:openrmf1234!@mongodb/openrmfpoam?authSource=openrmfpoam
-      - POAMDB=openrmfpoam
-      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
-      - SCANHISTORYDB=openrmfscanhistory
       - NATSSERVERURL=nats://natsserver:4222
       - LOGLEVEL=3
     depends_on:
@@ -555,45 +558,6 @@ services:
     networks:
       - openrmf
 
-  openrmfmsg-inventory:
-    image: eroman53/openrmf-msg-inventory:latest
-    container_name: openrmf-inventory-nats-message-client
-    restart: on-failure:5
-    environment:
-      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
-      - SYSTEMDB=openrmf
-      - INVENTORYDBCONNECTION=mongodb://openrmfinventory:openrmf1234!@mongodb/openrmfinventory?authSource=openrmfinventory
-      - INVENTORYDB=openrmfinventory
-      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:openrmf1234!@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
-      - SCANHISTORYDB=openrmfscanhistory
-      - NATSSERVERURL=nats://natsserver:4222
-      - LOGLEVEL=2
-    depends_on:
-      - mongodb
-      - natsserver
-    networks:
-      - openrmf
-
-  openrmfmsg-journal:
-    image: eroman53/openrmf-msg-journal:latest
-    container_name: openrmf-journal-nats-message-client
-    restart: on-failure:5
-    environment:
-      - SYSTEMDBCONNECTION=mongodb://openrmf:openrmf1234!@mongodb/openrmf?authSource=openrmf
-      - SYSTEMDB=openrmf
-      - JOURNALDBCONNECTION=mongodb://openrmfjournal:openrmf1234!@mongodb/openrmfjournal?authSource=openrmfjournal
-      - JOURNALDB=openrmfjournal
-      - NATSSERVERURL=nats://natsserver:4222
-      - LOGLEVEL=3
-    depends_on:
-      - mongodb
-      - natsserver
-    networks:
-      - openrmf
-
-### MongoDB (consolidated: one instance hosts every service database; the
-### "one database per service, no shared writes" rule is preserved via
-### per-database users -- see initializeAll.js)
   mongodb:
     image: docker.io/cingulara/mongo:7.0.32-jammy-nonroot
     container_name: mongodb
