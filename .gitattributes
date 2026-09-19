@@ -1,0 +1,6 @@
+# The git hook is a bash script that gets copied into .git/hooks and run by
+# sh. On a Windows checkout with autocrlf on it would arrive with CRLF line
+# endings, and the shebang would then read as "/usr/bin/env bash\r", which
+# fails with a bad-interpreter error that names a binary nobody can find.
+# Keep it LF wherever it is checked out.
+code-analysis/hooks/pre-commit text eol=lf
