@@ -1,0 +1,279 @@
+# STOOGE static analysis ruleset.
+# Copyright (c) eroman53 2026. Licensed under the GNU GPL v3; see LICENSE.
+#
+# Canonical copy: openrmf-docs/code-analysis/stooge.editorconfig
+# install-analysis.ps1 copies this to each service repo root as .editorconfig.
+# Edit the canonical copy and re-run the installer; hand-editing a copy makes
+# that one repo build under different rules than the rest, silently.
+#
+# ----------------------------------------------------------------------------
+# HOW THIS IS BUILT, AND WHY IT IS SO LITERAL
+#
+# Directory.Build.props sets AnalysisMode=None, which turns every analyzer rule
+# off. This file then names each rule we want, one line at a time. Nothing fires
+# unless it is listed here, so the ruleset is an allow-list and an SDK upgrade
+# cannot quietly add hundreds of warnings to everyone's build.
+#
+# It has to be this literal. The SDK does not implement AnalysisMode by leaving
+# rules at their defaults -- it injects a generated .globalconfig carrying an
+# explicit "dotnet_diagnostic.<rule>.severity" line for every rule in the
+# catalog. Roslyn resolves an explicit per-rule entry ahead of any bulk or
+# category-wide entry, wherever each one came from. So the tidy one-liners
+#
+#     dotnet_analyzer_diagnostic.severity = none
+#     dotnet_analyzer_diagnostic.category-Security.severity = error
+#
+# parse without complaint, appear to work, and do absolutely nothing: the
+# generated per-rule entries outrank them both. This was measured, not assumed
+# (2026-09-18: a config written that way silenced nothing and the full 3,146
+# findings came back). Per-rule entries here do win, so per-rule is what this
+# file uses.
+#
+# Two tiers:
+#
+#   error   - blocks the build, therefore blocks the commit. The analyzers'
+#             whole Security category, all 94 rules. Verified clean across all
+#             sixteen repos before being switched on, so this tier stops future
+#             defects rather than yesterday's.
+#
+#   warning - reported in the analysis report, never blocks. Correctness rules
+#             that have real hits today, meant to be driven down over time.
+#
+# Ratchet, do not gate. Do not promote a rule into the error tier without first
+# running a full analysis and confirming the count is zero.
+# ----------------------------------------------------------------------------
+
+root = true
+
+[*.cs]
+
+# ============================================================================
+# ERROR TIER - the Security category, in full
+# ============================================================================
+# Taken verbatim from the SDK's own security rule set
+# (analyzers/build/config/analysislevelsecurity_8_all.globalconfig) so the list
+# is the analyzers' definition of "security", not one assembled by hand. Regenerate
+# from that file when the SDK's analysis level moves.
+
+# --- SQL injection, unsafe permission demands, pointer security -------------
+dotnet_diagnostic.CA2100.severity = error
+dotnet_diagnostic.CA2119.severity = error
+dotnet_diagnostic.CA2153.severity = error
+
+# --- unsafe deserialization (BinaryFormatter, NetDataContractSerializer,
+#     LosFormatter, ObjectStateFormatter, JSON.NET TypeNameHandling, ...) -----
+dotnet_diagnostic.CA2300.severity = error
+dotnet_diagnostic.CA2301.severity = error
+dotnet_diagnostic.CA2302.severity = error
+dotnet_diagnostic.CA2305.severity = error
+dotnet_diagnostic.CA2310.severity = error
+dotnet_diagnostic.CA2311.severity = error
+dotnet_diagnostic.CA2312.severity = error
+dotnet_diagnostic.CA2315.severity = error
+dotnet_diagnostic.CA2321.severity = error
+dotnet_diagnostic.CA2322.severity = error
+dotnet_diagnostic.CA2326.severity = error
+dotnet_diagnostic.CA2327.severity = error
+dotnet_diagnostic.CA2328.severity = error
+dotnet_diagnostic.CA2329.severity = error
+dotnet_diagnostic.CA2330.severity = error
+dotnet_diagnostic.CA2350.severity = error
+dotnet_diagnostic.CA2351.severity = error
+dotnet_diagnostic.CA2352.severity = error
+dotnet_diagnostic.CA2353.severity = error
+dotnet_diagnostic.CA2354.severity = error
+dotnet_diagnostic.CA2355.severity = error
+dotnet_diagnostic.CA2356.severity = error
+dotnet_diagnostic.CA2361.severity = error
+dotnet_diagnostic.CA2362.severity = error
+
+# --- injection: command, path, SQL, LDAP, XSS, XPath, regex, redirect -------
+# These are taint-tracking rules. They cost build time, and they are worth it:
+# this fork shells out to Trivy, walks a mounted scan tree, and accepts uploaded
+# files, which is exactly the shape they exist to watch.
+dotnet_diagnostic.CA3001.severity = error
+dotnet_diagnostic.CA3002.severity = error
+dotnet_diagnostic.CA3003.severity = error
+dotnet_diagnostic.CA3004.severity = error
+dotnet_diagnostic.CA3005.severity = error
+dotnet_diagnostic.CA3006.severity = error
+dotnet_diagnostic.CA3007.severity = error
+dotnet_diagnostic.CA3008.severity = error
+dotnet_diagnostic.CA3009.severity = error
+dotnet_diagnostic.CA3010.severity = error
+dotnet_diagnostic.CA3011.severity = error
+dotnet_diagnostic.CA3012.severity = error
+
+# --- unsafe XML: XXE, DTD processing, insecure resolvers --------------------
+# STOOGE parses .nessus, .ckl and XCCDF from outside the trust boundary, so
+# these are the rules most likely to catch a real problem in new parser code.
+dotnet_diagnostic.CA3061.severity = error
+dotnet_diagnostic.CA3075.severity = error
+dotnet_diagnostic.CA3076.severity = error
+dotnet_diagnostic.CA3077.severity = error
+dotnet_diagnostic.CA3147.severity = error
+
+# --- cryptography, TLS, certificates, tokens --------------------------------
+dotnet_diagnostic.CA5350.severity = error
+dotnet_diagnostic.CA5351.severity = error
+dotnet_diagnostic.CA5358.severity = error
+dotnet_diagnostic.CA5359.severity = error
+dotnet_diagnostic.CA5360.severity = error
+dotnet_diagnostic.CA5361.severity = error
+dotnet_diagnostic.CA5362.severity = error
+dotnet_diagnostic.CA5363.severity = error
+dotnet_diagnostic.CA5364.severity = error
+dotnet_diagnostic.CA5365.severity = error
+dotnet_diagnostic.CA5366.severity = error
+dotnet_diagnostic.CA5367.severity = error
+dotnet_diagnostic.CA5368.severity = error
+dotnet_diagnostic.CA5369.severity = error
+dotnet_diagnostic.CA5370.severity = error
+dotnet_diagnostic.CA5371.severity = error
+dotnet_diagnostic.CA5372.severity = error
+dotnet_diagnostic.CA5373.severity = error
+dotnet_diagnostic.CA5374.severity = error
+dotnet_diagnostic.CA5375.severity = error
+dotnet_diagnostic.CA5376.severity = error
+dotnet_diagnostic.CA5377.severity = error
+dotnet_diagnostic.CA5378.severity = error
+dotnet_diagnostic.CA5379.severity = error
+dotnet_diagnostic.CA5380.severity = error
+dotnet_diagnostic.CA5381.severity = error
+dotnet_diagnostic.CA5382.severity = error
+dotnet_diagnostic.CA5383.severity = error
+dotnet_diagnostic.CA5384.severity = error
+dotnet_diagnostic.CA5385.severity = error
+dotnet_diagnostic.CA5386.severity = error
+dotnet_diagnostic.CA5387.severity = error
+dotnet_diagnostic.CA5388.severity = error
+dotnet_diagnostic.CA5389.severity = error
+dotnet_diagnostic.CA5390.severity = error
+dotnet_diagnostic.CA5391.severity = error
+dotnet_diagnostic.CA5392.severity = error
+dotnet_diagnostic.CA5393.severity = error
+dotnet_diagnostic.CA5394.severity = error
+dotnet_diagnostic.CA5395.severity = error
+dotnet_diagnostic.CA5396.severity = error
+dotnet_diagnostic.CA5397.severity = error
+dotnet_diagnostic.CA5398.severity = error
+dotnet_diagnostic.CA5399.severity = error
+dotnet_diagnostic.CA5400.severity = error
+dotnet_diagnostic.CA5401.severity = error
+dotnet_diagnostic.CA5402.severity = error
+dotnet_diagnostic.CA5403.severity = error
+dotnet_diagnostic.CA5405.severity = error
+
+# One exception, documented rather than hidden: CA5404 "do not disable token
+# validation checks". Twelve hits, the same line in each service's Startup --
+# ValidateAudience = false. It is deliberate: the realm issues one audience for
+# the whole stack and the services do not each register their own, while issuer,
+# signature and lifetime validation all stay on. Kept at warning rather than
+# suppressed so it appears in the security section of every report, and so a
+# decision to give services distinct audiences has a standing reminder.
+dotnet_diagnostic.CA5404.severity = warning
+
+# ============================================================================
+# WARNING TIER - correctness
+# ============================================================================
+
+# --- logging correctness ---------------------------------------------------
+# The upstream convention is LogError(ex, "message {0}", value). Structured
+# logging sinks read {0} as a literal placeholder name, not a position, so these
+# messages render wrong anywhere logs are shipped somewhere that parses them.
+# Mechanical to fix, and the largest single block of real debt here.
+dotnet_diagnostic.CA2253.severity = warning
+dotnet_diagnostic.CA2254.severity = warning
+
+# --- resource handling -----------------------------------------------------
+# Disposables dropped before disposal. This fork holds GridFS streams, file
+# handles and HTTP clients open across async boundaries, so these are leaks.
+dotnet_diagnostic.CA2000.severity = warning
+dotnet_diagnostic.CA1001.severity = warning
+dotnet_diagnostic.CA1063.severity = warning
+dotnet_diagnostic.CA1816.severity = warning
+
+# --- culture-sensitive string handling -------------------------------------
+# The bug class that matters most here. STOOGE parses DISA, NIST, Nessus and
+# XCCDF content, and comparing or case-converting control IDs with the ambient
+# culture makes a parser behave differently depending on the host's locale.
+# CA1310 comparison, CA1304 and CA1311 case conversion, CA1862 the
+# ToLower()==ToLower() idiom that should be an ordinal comparison.
+dotnet_diagnostic.CA1310.severity = warning
+dotnet_diagnostic.CA1304.severity = warning
+dotnet_diagnostic.CA1311.severity = warning
+dotnet_diagnostic.CA1862.severity = warning
+
+# --- async correctness -----------------------------------------------------
+# Blocking calls inside async methods (.Result, .Wait(), Thread.Sleep) starve
+# the thread pool under load, and a dropped CancellationToken makes shutdown and
+# request cancellation silently not work.
+dotnet_diagnostic.CA1849.severity = warning
+dotnet_diagnostic.CA2016.severity = warning
+dotnet_diagnostic.CA2008.severity = warning
+
+# --- plain defects ---------------------------------------------------------
+# Wrong arguments to format strings, results thrown away, reserved exception
+# types thrown, conditions that can never be true, self-assignment.
+dotnet_diagnostic.CA2241.severity = warning
+dotnet_diagnostic.CA1806.severity = warning
+dotnet_diagnostic.CA2201.severity = warning
+dotnet_diagnostic.CA1508.severity = warning
+dotnet_diagnostic.CA2245.severity = warning
+dotnet_diagnostic.CA2246.severity = warning
+dotnet_diagnostic.CA2242.severity = warning
+dotnet_diagnostic.CA1854.severity = warning
+dotnet_diagnostic.CA2249.severity = warning
+
+# ============================================================================
+# ANALYZERS THAT ANALYSISMODE DOES NOT REACH
+# ============================================================================
+# AnalysisMode governs the CA catalog only. Analyzers shipped by ASP.NET Core
+# and by the runtime's source generators are separate packages that ignore it
+# entirely and arrive at their own default severities, so switching every CA
+# rule off still left these firing. Same standard as everything else: style and
+# micro-performance suggestions are off, and they have to be named to be off.
+dotnet_diagnostic.ASP0015.severity = none   # (2)  use IHeaderDictionary properties
+dotnet_diagnostic.ASP0025.severity = none   # (12) use AddAuthorizationBuilder
+dotnet_diagnostic.SYSLIB1045.severity = none # (9) convert to GeneratedRegexAttribute
+
+# ============================================================================
+# NOTABLE EXCLUSIONS
+# ============================================================================
+# Left off on purpose. Recorded here so the next person does not spend an
+# afternoon rediscovering why the loudest rules are missing. Counts are from the
+# 2026-09-18 survey of all sixteen repos with the whole catalog enabled.
+#
+#   CA2007 (590)  ConfigureAwait on awaited tasks. The loudest rule in the
+#                 catalog and meaningless in ASP.NET Core, which has no
+#                 synchronization context to deadlock against.
+#   CA1305 (461)  Specify IFormatProvider. Overwhelmingly int.ToString() for
+#                 spreadsheet cell values. The services run with invariant
+#                 globalization; the culture rules that can actually change
+#                 behavior are enabled above instead.
+#   CA1848 (331)  LoggerMessage delegates. A hot-path allocation optimization.
+#                 These services are I/O bound against Mongo and NATS.
+#   CA1307 (176)  StringComparison "for clarity". The correctness half of this
+#                 family is CA1310, which is enabled.
+#   CA1031 (162)  Do not catch general exception types. Deliberate here: the
+#                 ingest paths catch broadly on purpose so that a delta or parse
+#                 failure cannot fail an upload that was already stored.
+#   CA1062 (110)  Validate arguments of public methods. Wants null guards on
+#                 parameters dependency injection is contractually required to
+#                 populate.
+#   CA1002/CA2227/CA1051/CA1034/CA1056  API surface design. These are DTOs
+#                 deserialized by Mongo and System.Text.Json; settable
+#                 collection properties are the requirement, not a mistake.
+#   CA1707 (110)  Underscores in identifiers. The upstream naming convention.
+#   CA1308 (37)   Normalize strings to uppercase. Every hit is ToLowerInvariant()
+#                 building case-insensitive lookup keys, which is the safe use
+#                 the rule's Turkish-I rationale does not cover.
+#   Performance, naming and style families generally. Not wrong, just not what
+#                 this tool is for; they would bury the findings above.
+
+# Compiler warnings (CS####) are not analyzer diagnostics and are untouched by
+# AnalysisMode. They stay on at their default severity, which is what we want.
+
+[*.{csproj,props,targets}]
+indent_style = space
+indent_size = 2

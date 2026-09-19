@@ -1,0 +1,23 @@
+# In-scope repositories for STOOGE static analysis, one per line.
+# These are the repos whose C# we own: the fourteen new STOOGE services plus the
+# two upstream forks we have modified. Reference-only upstream clones
+# (openrmf-msg-score, openrmf-msg-audit, openrmf-api-compliance,
+# openrmf-api-controls) and the superseded pre-v1.8 split services
+# (openrmf-api-upload, openrmf-api-save) are deliberately absent: we do not edit
+# them, so analyzing them would report other people's debt as ours.
+openrmf-api-conmon
+openrmf-api-inventory
+openrmf-api-journal
+openrmf-api-oscal
+openrmf-api-poam
+openrmf-api-ppsm
+openrmf-api-read
+openrmf-api-scanhistory
+openrmf-api-tasks
+openrmf-msg-inventory
+openrmf-msg-journal
+openrmf-msg-poam
+openrmf-msg-reports
+openrmf-svc-notify
+openrmf-svc-scanwatch
+openrmf-svc-trivy
