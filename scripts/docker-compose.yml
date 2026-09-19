@@ -3,7 +3,7 @@ version : '3.8'
 services:
 ### 1 Web Front End Container
   openrmf-web:
-    image: docker.io/cingulara/openrmf-web:1.14.01
+    image: eroman53/openrmf-web:latest
     # image: cingulara/openrmf-web:1.14.01-privileged # this is to eventually make HTTPS 443 in a non-privileged manner
     container_name: openrmf-web
     restart: on-failure:5
@@ -64,7 +64,7 @@ services:
       - openrmf
 
   openrmfapi-read:
-    image: docker.io/cingulara/openrmf-api-read:1.14.02
+    image: eroman53/openrmf-api-read:latest
     container_name: openrmf-read-api
     restart: on-failure:5
     ports:
@@ -298,7 +298,7 @@ services:
       - openrmf
 
   openrmfmsg-reports:
-    image: docker.io/cingulara/openrmf-msg-reports:1.14.01
+    image: eroman53/openrmf-msg-reports:latest
     container_name: openrmf-report-nats-message-client
     restart: on-failure:5
     environment:
