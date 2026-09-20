@@ -5,6 +5,12 @@
   .frame { max-width: 1800px !important; }
   .scroller { overflow: visible !important; }
   .scroller svg { min-width: 1760px !important; }
+  /* the PPSM matrix is wider than the 1180px reading column; let the exported
+     PNG/PDF show every column instead of clipping Purpose and Direction. */
+  .tablewrap { max-width: 2100px !important; overflow: visible !important; }
+  .boundary { max-width: 2100px !important; }
+  header, h2.wrap, .wrap, .legend, footer { max-width: 2100px !important; }
+  table.ppsm { min-width: 0 !important; }
 </style>
 </head><body>
 <title>STOOGE — Architecture & Ports/Protocols</title>
@@ -141,9 +147,9 @@
     single consolidated MongoDB. All fork-built .NET services run on the <b>UBI8 (RHEL&nbsp;8.10) base</b> with the DoD CA bundle.
     Teal marks fork additions/modifications.</p>
   <div class="counts">
-    <span><b>37</b> containers</span>
+    <span><b>29</b> containers <b style="color:var(--muted);font-weight:400">default Â· 34 with metrics</b></span>
     <span><b>17</b> HTTP services</span>
-    <span><b>10</b> NATS listeners</span>
+    <span><b>7</b> NATS listeners</span>
     <span><b>1</b> Mongo container · 16 logical DBs</span>
     <span><b>1</b> host-exposed port (8080)</span>
     <span>UBI8 fork services</span>
@@ -166,14 +172,17 @@
       <div style="font-variant-numeric:tabular-nums; font-weight:650;">49</div>
     </div>
     <div style="display:grid; grid-template-columns: 210px 1fr 52px; align-items:center; gap:14px;">
-      <div style="font-size:13.5px; font-weight:600;">STOOGE fork <span style="color:var(--accent-ink);">— Mongo-consolidated</span></div>
-      <div style="background:var(--chip); border-radius:5px; height:26px; position:relative;"><div style="background:var(--accent); width:76%; height:100%; border-radius:5px;"></div></div>
-      <div style="font-variant-numeric:tabular-nums; font-weight:680; color:var(--accent-ink);">37</div>
+      <div style="font-size:13.5px; font-weight:600;">STOOGE fork <span style="color:var(--accent-ink);">— Mongo-consolidated, hub-merged, metrics opt-in</span></div>
+      <div style="background:var(--chip); border-radius:5px; height:26px; position:relative;"><div style="background:var(--accent); width:59%; height:100%; border-radius:5px;"></div></div>
+      <div style="font-variant-numeric:tabular-nums; font-weight:680; color:var(--accent-ink);">29</div>
     </div>
   </div>
-  <p style="margin:14px 0 0; font-size:13px; color:var(--muted);">The fork adds <b>14 new microservices</b> (Scan History, POA&amp;M, Journal, Scan Watch,
-    ConMon, Inventory, Tasks, Trivy, Notify, PPSM, 800-53 Catalog + three NATS listeners) yet lands at <b>37 containers</b> —
-    consolidating the data tier from 13 Mongo containers to 1 absorbed most of the growth. Test-only Samba container excluded.</p>
+  <p style="margin:14px 0 0; font-size:13px; color:var(--muted);">The fork adds <b>12 new services</b> (Scan History, POA&amp;M, Journal, Scan Watch,
+    ConMon, Inventory, Tasks, Trivy, Notify, PPSM, 800-53 Catalog, plus the message hub) yet lands <b>below upstream</b> at
+    <b>29 containers</b>. Three consolidations paid for the growth: 13 Mongo containers to <b>1</b> (16 logical DBs), the four
+    fork NATS listeners to <b>1</b> (<span class="mono">openrmf-msg-hub</span>), and the five observability containers behind an
+    opt-in <span class="mono">metrics</span> profile — <span class="mono">docker compose --profile metrics up -d</span> restores
+    them at 34. Test-only Samba container excluded.</p>
 </div>
 
 <h2 class="wrap">1 · Container architecture</h2>
@@ -273,18 +282,13 @@
 
   <!-- band -> listeners -->
   <line x1="250" y1="814" x2="250" y2="776" class="nats" marker-end="url(#anats)"/>
-  <line x1="610" y1="814" x2="610" y2="776" class="nats" marker-end="url(#anats)"/>
-  <line x1="835" y1="814" x2="835" y2="776" class="nats" marker-end="url(#anats)"/>
-  <line x1="1035" y1="814" x2="1035" y2="776" class="nats" marker-end="url(#anats)"/>
-  <line x1="1250" y1="814" x2="1250" y2="776" class="nats" marker-end="url(#anats)"/>
+  <line x1="930" y1="814" x2="930" y2="776" class="nats" marker-end="url(#anats)"/>
 
   <!-- listeners <-> data band (cross-service reads/writes) -->
   <line x1="250" y1="700" x2="250" y2="648" class="mongo" marker-end="url(#amongo)"/>
-  <line x1="610" y1="700" x2="610" y2="648" class="mongo acc" marker-end="url(#amacc)"/>
-  <line x1="835" y1="700" x2="835" y2="648" class="mongo acc" marker-end="url(#amacc)"/>
-  <line x1="1035" y1="700" x2="1035" y2="648" class="mongo acc" marker-end="url(#amacc)"/>
-  <line x1="1250" y1="700" x2="1250" y2="648" class="mongo acc" marker-end="url(#amacc)"/>
-  <text x="640" y="688" class="elabel acc">read-only cross-service views: checklistdb · scanhistorydb (findings, scan hosts) · templatedb</text>
+  <line x1="700" y1="700" x2="700" y2="648" class="mongo acc" marker-end="url(#amacc)"/>
+  <line x1="1160" y1="700" x2="1160" y2="648" class="mongo acc" marker-end="url(#amacc)"/>
+  <text x="640" y="688" class="elabel acc">each hub module keeps its OWN Mongo credentials · read-only cross-service views: checklistdb · scanhistorydb · templatedb</text>
 
   <!-- ======== NODES ======== -->
   <!-- external row -->
@@ -307,19 +311,20 @@
   <!-- edge row -->
   <rect x="60" y="150" width="560" height="62" class="node mod"/>
   <text x="340" y="174" text-anchor="middle" class="t">openrmf-web · NGINX <tspan class="tag">:8080</tspan></text>
-  <text x="340" y="192" text-anchor="middle" class="sub">STOOGE UI (14 pages) + reverse proxy + no-cache HTML/JS · Alpine</text>
+  <text x="340" y="192" text-anchor="middle" class="sub">STOOGE UI (19 pages) + reverse proxy + no-cache HTML/JS · Alpine</text>
 
   <rect x="680" y="150" width="200" height="62" class="node"/>
   <text x="780" y="174" text-anchor="middle" class="ts">Keycloak <tspan class="tag">:8080 /auth</tspan></text>
-  <text x="780" y="192" text-anchor="middle" class="sub">OIDC · UBI9 lineage</text>
+  <text x="780" y="192" text-anchor="middle" class="sub">OIDC 26.7.2 · UBI9 lineage</text>
 
   <rect x="910" y="150" width="130" height="62" class="node"/>
   <text x="975" y="174" text-anchor="middle" class="ts">PostgreSQL</text>
   <text x="975" y="192" text-anchor="middle" class="tag">:5432</text>
 
   <rect x="1070" y="150" width="420" height="62" class="cluster"/>
-  <text x="1086" y="172" class="ts mutedt">Observability</text>
-  <text x="1086" y="190" class="tag">prometheus :9090 · grafana :3000 (/metrics/) · nats-exp :7777 · nginx-exp :9113</text>
+  <text x="1086" y="168" class="ts mutedt">Observability <tspan class="tag">— opt-in `metrics` profile, off by default</tspan></text>
+  <text x="1086" y="185" class="tag">prometheus :9090 · grafana :3000 (/metrics/) · nats-exp :7777 · nginx-exp :9113 · nats-client-metrics</text>
+  <text x="1086" y="201" class="tag">nginx resolves these per request, so absence is a 502 — not a gateway that refuses to start</text>
 
   <!-- API row A -->
   <rect x="60" y="296" width="400" height="84" class="cluster"/>
@@ -374,10 +379,12 @@
   <text x="1430" y="430" text-anchor="middle" class="t acc">PPSM <tspan class="tag">:8118</tspan></text>
   <text x="1430" y="448" text-anchor="middle" class="sub">ports baseline · recon</text>
 
-  <rect x="1520" y="406" width="170" height="84" class="node new"/>
-  <text x="1605" y="428" text-anchor="middle" class="t acc">800-53 Catalog <tspan class="tag">:8120</tspan></text>
-  <text x="1605" y="446" text-anchor="middle" class="sub">OSCAL + DISA CCI</text>
-  <text x="1605" y="462" text-anchor="middle" class="sub">tailoring · statements</text>
+  <rect x="1520" y="406" width="170" height="98" class="node new"/>
+  <text x="1605" y="426" text-anchor="middle" class="t acc">800-53 Catalog <tspan class="tag">:8120</tspan></text>
+  <text x="1605" y="443" text-anchor="middle" class="sub">OSCAL Rev 5 + DISA CCI</text>
+  <text x="1605" y="459" text-anchor="middle" class="sub">DCSA overlay · tailoring</text>
+  <text x="1605" y="475" text-anchor="middle" class="sub">statements · ConMon calendar</text>
+  <text x="1605" y="491" text-anchor="middle" class="sub">framework crosswalk</text>
 
   <!-- data band -->
   <rect x="60" y="560" width="1630" height="88" class="databand"/>
@@ -391,21 +398,10 @@
   <text x="76" y="742" class="tag">msg-score · msg-compliance · msg-controls</text>
   <text x="76" y="758" class="tag">msg-template · msg-system · msg-audit</text>
 
-  <rect x="535" y="700" width="150" height="76" class="node mod"/>
-  <text x="610" y="726" text-anchor="middle" class="ts">msg-reports</text>
-  <text x="610" y="746" text-anchor="middle" class="sub">reads scans from GridFS</text>
-
-  <rect x="760" y="700" width="150" height="76" class="node new"/>
-  <text x="835" y="726" text-anchor="middle" class="ts acc">msg-poam</text>
-  <text x="835" y="746" text-anchor="middle" class="sub">POA&amp;M reconciliation</text>
-
-  <rect x="960" y="700" width="150" height="76" class="node new"/>
-  <text x="1035" y="726" text-anchor="middle" class="ts acc">msg-journal</text>
-  <text x="1035" y="746" text-anchor="middle" class="sub">append-only journal</text>
-
-  <rect x="1175" y="700" width="150" height="76" class="node new"/>
-  <text x="1250" y="726" text-anchor="middle" class="ts acc">msg-inventory</text>
-  <text x="1250" y="746" text-anchor="middle" class="sub">asset sync + classify</text>
+  <rect x="535" y="700" width="790" height="76" class="node new"/>
+  <text x="930" y="721" text-anchor="middle" class="ts acc">openrmf-msg-hub <tspan class="tag">one container, four modules</tspan></text>
+  <text x="930" y="739" text-anchor="middle" class="sub">reports (scans from GridFS) · poam (reconciliation) · journal (append-only) · inventory (asset sync + classify)</text>
+  <text x="930" y="757" text-anchor="middle" class="tag">Dispatcher subscribes ONCE per subject (23 subs → 8) · ArtifactCache shares one Mongo read across modules, per message</text>
 
   <!-- NATS band -->
   <rect x="60" y="814" width="1630" height="46" class="band"/>
@@ -447,7 +443,7 @@
 
     <tr class="grp"><td colspan="6">Gateway (NGINX reverse proxy)</td></tr>
     <tr><td>NGINX</td><td>Keycloak</td><td class="mono">8080/tcp</td><td>HTTP / OIDC</td><td><span class="mono">/auth/</span> — login, tokens, JWKS</td><td><span class="dir int">internal</span></td></tr>
-    <tr><td>NGINX</td><td>Grafana</td><td class="mono">3000/tcp</td><td>HTTP</td><td><span class="mono">/metrics/</span> dashboards</td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>NGINX</td><td>Grafana <span class="mono">(metrics profile)</span></td><td class="mono">3000/tcp</td><td>HTTP</td><td><span class="mono">/metrics/</span> dashboards. Resolved per request via <span class="mono">resolver 127.0.0.11</span> — with the profile off the route returns 502 instead of preventing NGINX from starting.</td><td><span class="dir int">internal</span></td></tr>
     <tr><td>NGINX</td><td>Read API</td><td class="mono">8084/tcp</td><td>HTTP REST</td><td><span class="mono">/api/read/</span> save · upload · read</td><td><span class="dir int">internal</span></td></tr>
     <tr><td>NGINX</td><td>Template / Scoring / Controls / Audit / Report APIs</td><td class="mono">8088 · 8090 · 8094 · 8096 · 8098/tcp</td><td>HTTP REST</td><td>Upstream API routes</td><td><span class="dir int">internal</span></td></tr>
     <tr><td>NGINX</td><td>Scan History / POA&amp;M / Journal / Scan Watch / ConMon / Inventory / Tasks / Trivy Scanner / Notify / PPSM / 800-53 Catalog</td><td class="mono">8100 · 8102 · 8104 · 8106 · 8108 · 8110 · 8112 · 8114 · 8116 · 8118 · 8120/tcp</td><td>HTTP REST</td><td>Fork service routes (<span class="mono">/api/scanhistory/ · /api/poam/ · /api/journal/ · /api/scanwatch/ · /api/conmon/ · /api/inventory/ · /api/tasks/ · /api/trivyscan/ · /api/notify/ · /api/ppsm/ · /api/oscal/</span>)</td><td><span class="dir int">internal</span></td></tr>
@@ -464,13 +460,13 @@
 
     <tr class="grp"><td colspan="6">Messaging backbone</td></tr>
     <tr><td>Read API (+ every API for audit events)</td><td>NATS</td><td class="mono">4222/tcp</td><td>NATS pub</td><td><span class="mono">openrmf.checklist.save.* · system.patchscan · system.delete · audit.&gt;</span></td><td><span class="dir int">internal</span></td></tr>
-    <tr><td>10 msg listeners (score · compliance · controls · template · system · audit · reports · poam · journal · inventory)</td><td>NATS</td><td class="mono">4222/tcp</td><td>NATS sub</td><td>Event-driven reconciliation, journaling, scoring, reporting</td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>7 msg listeners — 6 upstream (score · compliance · controls · template · system · audit) + <span class="mono">openrmf-msg-hub</span></td><td>NATS</td><td class="mono">4222/tcp</td><td>NATS sub</td><td>Event-driven reconciliation, journaling, scoring, reporting. The hub subscribes once per subject and runs its four modules in a deterministic order, replacing four containers that each received the same three high-traffic subjects.</td><td><span class="dir int">internal</span></td></tr>
 
     <tr class="grp"><td colspan="6">Data tier</td></tr>
     <tr><td>Each service</td><td>Consolidated MongoDB — own logical DB + user</td><td class="mono">27017/tcp</td><td>MongoDB wire</td><td>One database per service, isolated by per-DB credentials — no shared writes</td><td><span class="dir int">internal</span></td></tr>
-    <tr><td>msg-poam · msg-reports · msg-journal · msg-inventory · ConMon · Inventory API</td><td>checklistdb · scanhistorydb · templatedb · poamdb</td><td class="mono">27017/tcp</td><td>MongoDB wire</td><td>Deliberate read-only cross-service views (findings, scan hosts, checklists, templates)</td><td><span class="dir int">internal</span></td></tr>
+    <tr><td>msg-hub (reports · poam · journal · inventory modules, each with its own credentials) · ConMon · Inventory API · 800-53 Catalog</td><td>checklistdb · scanhistorydb · templatedb · poamdb · oscaldb</td><td class="mono">27017/tcp</td><td>MongoDB wire</td><td>Deliberate read-only cross-service views (findings, scan hosts, checklists, templates)</td><td><span class="dir int">internal</span></td></tr>
 
-    <tr class="grp"><td colspan="6">Observability</td></tr>
+    <tr class="grp"><td colspan="6">Observability — opt-in <span class="mono">metrics</span> profile, absent from a default deployment</td></tr>
     <tr><td>Prometheus</td><td>Service <span class="mono">/metrics</span> endpoints · NATS exporter · NGINX exporter</td><td class="mono">service ports · 7777 · 9113/tcp</td><td>HTTP scrape</td><td>Metrics collection across every tier</td><td><span class="dir int">internal</span></td></tr>
     <tr><td>NATS exporter</td><td>NATS monitoring</td><td class="mono">8222/tcp</td><td>HTTP</td><td>varz / connz / subz</td><td><span class="dir int">internal</span></td></tr>
     <tr><td>Grafana</td><td>Prometheus</td><td class="mono">9090/tcp</td><td>HTTP / PromQL</td><td>Dashboards (served to users via NGINX <span class="mono">/metrics/</span>)</td><td><span class="dir int">internal</span></td></tr>
@@ -479,10 +475,14 @@
 </div>
 
 <footer>
-  Sources: <span class="mono">openrmf-docs/scripts/docker-compose.yml</span> + <span class="mono">nginx.conf</span> as of the MongoDB consolidation (2026-07-20) on top of the UBI8 rebase
-  (2026-07-18), refreshed 2026-09-18 for the Notify, PPSM and 800-53 Catalog services. Ports verified against the live
-  nginx upstream config and the running containers; fork images scan 0 CRITICAL, with 8 vendor-unfixed HIGH inherited from the
-  RHEL base. The PPSM module this matrix was drafted for is now built (:8118).
+  Sources: <span class="mono">openrmf-docs/scripts/docker-compose.yml</span> + <span class="mono">nginx.conf</span>, regenerated <b>2026-09-20</b> for the
+  <b>v0.9.0-beta</b> release. This revision folds in the four-listener merge into <span class="mono">openrmf-msg-hub</span>, the opt-in
+  <span class="mono">metrics</span> profile (29 containers default / 34 with it), Keycloak 26.7.2, and the DCSA overlay, ConMon calendar
+  and framework crosswalk added to the 800-53 Catalog service. Service names, ports and profiles were read from
+  <span class="mono">docker compose config --services</span> and the live <span class="mono">docker ps</span> rather than transcribed.
+  At release every fork image scans <b>0 CRITICAL</b>; the 8 HIGH are vendor-unfixed and inherited from the RHEL 8.10 base. Keycloak
+  carries 3 CRITICAL in jars bundled inside the upstream distribution, each one patch version behind its fix — accepted, and
+  <span class="mono">trivy-scan.ps1 -Summary</span> will keep failing on them by design.
 </footer>
 
 </body></html>
