@@ -692,8 +692,8 @@ services:
   keycloak: 
     container_name: openrmf-keycloak
     # fork image: upstream keycloak-openrmf plus the STOOGE theme
-    #   docker build -t eroman53/keycloak-stooge:26.5.7 ../keycloak-image
-    image: eroman53/keycloak-stooge:26.5.7
+    #   docker build -t eroman53/keycloak-stooge:26.7.2 ../keycloak-image
+    image: eroman53/keycloak-stooge:26.7.2
     restart: on-failure:10
     command:
       - start

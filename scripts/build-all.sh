@@ -23,6 +23,14 @@ SUM=${2:-/tmp/build-all.summary}
 # them already fixed upstream.
 EPOCH=$(date +%Y%m%d)
 
+# Fail before building anything if this script, verify.sh or trivy-scan.ps1 has
+# drifted from docker-compose.yml. Building a set of images the stack does not
+# run is silent and wastes a full rebuild.
+if ! bash "$(dirname "$0")/check-image-lists.sh"; then
+  echo "ABORT: image lists disagree with docker-compose.yml (see above)" >&2
+  exit 1
+fi
+
 run() {
   tag=$1; shift
   printf '=== %s  start %s ===\n' "$tag" "$(date +%H:%M:%S)" >> "$LOG"
@@ -64,7 +72,7 @@ run eroman53/openrmf-web:latest             "$ROOT/openrmf-web"
 
 # 4) Keycloak carries the STOOGE theme, so build it with everything else rather
 #    than leaving the stack part-rebuilt.
-run eroman53/keycloak-stooge:26.5.7         "$ROOT/openrmf-docs/keycloak-image"
+run eroman53/keycloak-stooge:26.7.2         "$ROOT/openrmf-docs/keycloak-image"
 
 printf '=== finished %s ===\n' "$(date +%H:%M:%S)" >> "$SUM"
 cat "$SUM"
