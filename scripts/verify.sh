@@ -137,18 +137,38 @@ themes=$(MSYS_NO_PATHCONV=1 docker exec openrmf-keycloak /opt/keycloak/bin/kcadm
 note "  realm themes" "$themes"
 
 echo
-echo "=================== image freshness ==================="
+echo "=================== deployed image ==================="
+# Two questions here, and only the first is a real failure.
+#
+# HARD: is the running container on the image its tag currently points at?
+# That is the failure that actually bit us. Compose named an upstream image,
+# so a freshly built one never reached the stack and a fix that was built,
+# deployed and verified still appeared not to work.
+#
+# SOFT: is the image older than the repo's last commit? Suggestive, not proof.
+# Docker keeps .Created on a cache hit, so rebuilding after committing
+# unchanged source legitimately leaves the older timestamp. Reported, never
+# failed on, or the suite cries wolf every time a build is cached.
 stale=0
 while read -r repo img; do
     [ -d "d:/OpenRMF_Build/$repo/.git" ] || continue
+    tagid=$(docker image inspect "$img" --format '{{.Id}}' 2>/dev/null)
+    [ -z "$tagid" ] && { note "  $img" "MISSING"; fail=1; continue; }
+    cid=$(docker ps --filter "ancestor=$img" --format '{{.ID}}' | head -1)
+    if [ -n "$cid" ]; then
+        running=$(docker inspect "$cid" --format '{{.Image}}' 2>/dev/null)
+        if [ "$running" != "$tagid" ]; then
+            note "  $repo" "CONTAINER NOT ON CURRENT IMAGE  <-- rebuilt but never deployed"
+            stale=1; fail=1; continue
+        fi
+    fi
     ct=$(git -C "d:/OpenRMF_Build/$repo" log -1 --format=%ct)
     it=$(docker image inspect "$img" --format '{{.Created}}' 2>/dev/null)
-    [ -z "$it" ] && { note "  $img" "MISSING"; fail=1; continue; }
     is=$(date -d "$it" +%s 2>/dev/null)
     if [ -n "$is" ] && [ "$is" -ge "$ct" ]; then
-        note "  $repo" "image newer than last commit"
+        note "  $repo" "deployed, image newer than last commit"
     else
-        note "  $repo" "IMAGE OLDER THAN COMMIT"; stale=1; fail=1
+        note "  $repo" "deployed, image predates last commit (cached build?)"
     fi
 done <<ROWS
 openrmf-api-scanhistory eroman53/openrmf-api-scanhistory:latest
