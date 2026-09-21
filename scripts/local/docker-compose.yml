@@ -20,9 +20,10 @@ services:
     ports:
       - 27017:27017
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=REDACTED
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
       - MONGO_INITDB_DATABASE=openrmf
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
     volumes:
       - ./initializedbs.js:/docker-entrypoint-initdb.d/initialize.js:ro
     networks:
@@ -113,7 +114,7 @@ services:
     environment:
       - ME_CONFIG_MONGODB_SERVER=mongo
       - ME_CONFIG_MONGODB_ADMINUSERNAME=root
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=REDACTED
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_ROOT_PASSWORD}
       - ME_CONFIG_BASICAUTH_USERNAME=admin
       - ME_CONFIG_BASICAUTH_PASSWORD=admin
     networks:
@@ -128,7 +129,7 @@ services:
     environment:
       - POSTGRES_DB=openrmf-keycloak 
       - POSTGRES_USER=openrmf-keycloak 
-      - POSTGRES_PASSWORD=REDACTED
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
       - openrmf-local
     volumes:
@@ -148,7 +149,7 @@ services:
       - KC_DB=postgres
       - KC_DB_URL=jdbc:postgresql://openrmf-postgres16:5432/openrmf-keycloak
       - KC_DB_USERNAME=openrmf-keycloak
-      - KC_DB_PASSWORD=REDACTED
+      - KC_DB_PASSWORD=${POSTGRES_PASSWORD}
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=REDACTED
       - KC_HOSTNAME_STRICT=false

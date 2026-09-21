@@ -4,10 +4,12 @@
 // (auth) level -- each service still connects only to its own logical DB with
 // its own credentials. Replaces the 13 per-service initialize*.js scripts.
 var d;
+var appPassword = process.env.MONGO_PASSWORD;
+if (!appPassword) throw new Error("MONGO_PASSWORD must be supplied when initializing STOOGE databases");
 
 // ---- openrmf (checklist / systems) ----
 d = db.getSiblingDB('openrmf');
-d.createUser({ user: "openrmf", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmf" }] });
+d.createUser({ user: "openrmf", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmf" }] });
 d.createCollection("Artifacts");
 d.Artifacts.createIndex({ systemGroupId: 1 });
 d.Artifacts.createIndex({ stigType: 1 });
@@ -27,7 +29,7 @@ d.SystemGroups.createIndex({ title: "text", description: "text" }, { name: "ft_s
 
 // ---- openrmfscore ----
 d = db.getSiblingDB('openrmfscore');
-d.createUser({ user: "openrmfscore", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmfscore" }] });
+d.createUser({ user: "openrmfscore", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmfscore" }] });
 d.createCollection("Scores");
 d.Scores.createIndex({ artifactId: 1 });
 d.Scores.createIndex({ systemGroupId: 1 });
@@ -50,7 +52,7 @@ d.Scores.createIndex({ totalCat3NotReviewed: 1 });
 
 // ---- openrmftemplate ----
 d = db.getSiblingDB('openrmftemplate');
-d.createUser({ user: "openrmftemplate", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmftemplate" }] });
+d.createUser({ user: "openrmftemplate", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmftemplate" }] });
 d.createCollection("Templates");
 d.Templates.createIndex({ stigType: 1 });
 d.Templates.createIndex({ templateType: 1 });
@@ -63,7 +65,7 @@ d.Templates.createIndex({ title: 1 });
 
 // ---- openrmfaudit ----
 d = db.getSiblingDB('openrmfaudit');
-d.createUser({ user: "openrmfaudit", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmfaudit" }] });
+d.createUser({ user: "openrmfaudit", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmfaudit" }] });
 d.createCollection("Audits");
 d.Audits.createIndex({ created: -1 });
 d.Audits.createIndex({ username: 1 });
@@ -72,7 +74,7 @@ d.Audits.createIndex({ action: 1 });
 
 // ---- openrmfreport ----
 d = db.getSiblingDB('openrmfreport');
-d.createUser({ user: "openrmfreport", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmfreport" }] });
+d.createUser({ user: "openrmfreport", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmfreport" }] });
 d.createCollection("ACASScanReport");
 d.ACASScanReport.createIndex({ reportName: 1 });
 d.ACASScanReport.createIndex({ hostname: 1 });
@@ -104,7 +106,7 @@ d.VulnerabilityReport.createIndex({ ruleTitle: "text", vulnid: "text", hostname:
 
 // ---- openrmfscanhistory (fork: GridFS scan storage + delta findings) ----
 d = db.getSiblingDB('openrmfscanhistory');
-d.createUser({ user: "openrmfscanhistory", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmfscanhistory" }] });
+d.createUser({ user: "openrmfscanhistory", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmfscanhistory" }] });
 d.createCollection("ScanFiles");
 d.ScanFiles.createIndex({ systemGroupId: 1, scanType: 1, isLatest: 1 });
 d.ScanFiles.createIndex({ created: -1 });
@@ -118,14 +120,14 @@ d.ScanPorts.createIndex({ systemGroupId: 1, hostname: 1, port: 1, protocol: 1 })
 
 // ---- openrmfppsm (fork: ports/protocols/services registry) ----
 d = db.getSiblingDB('openrmfppsm');
-d.createUser({ user: "openrmfppsm", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmfppsm" }] });
+d.createUser({ user: "openrmfppsm", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmfppsm" }] });
 d.createCollection("PpsmEntries");
 d.PpsmEntries.createIndex({ systemGroupId: 1, port: 1, protocol: 1 });
 d.PpsmEntries.createIndex({ systemGroupId: 1, status: 1 });
 
 // ---- openrmfoscal (fork: 800-53 catalog + DISA CCI mapping, Phase 3) ----
 d = db.getSiblingDB('openrmfoscal');
-d.createUser({ user: "openrmfoscal", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmfoscal" }] });
+d.createUser({ user: "openrmfoscal", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmfoscal" }] });
 d.createCollection("Controls");
 d.Controls.createIndex({ controlId: 1 });
 d.Controls.createIndex({ family: 1 });
@@ -143,7 +145,7 @@ d.ComplianceStatements.createIndex({ assessmentDate: 1 });
 
 // ---- openrmfpoam (fork) ----
 d = db.getSiblingDB('openrmfpoam');
-d.createUser({ user: "openrmfpoam", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmfpoam" }] });
+d.createUser({ user: "openrmfpoam", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmfpoam" }] });
 d.createCollection("Poams");
 d.Poams.createIndex({ systemGroupId: 1, sourceType: 1, sourceKey: 1 });
 d.Poams.createIndex({ systemGroupId: 1, status: 1 });
@@ -152,14 +154,14 @@ d.Poams.createIndex({ created: -1 });
 
 // ---- openrmftrivyscan (fork) ----
 d = db.getSiblingDB('openrmftrivyscan');
-d.createUser({ user: "openrmftrivyscan", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmftrivyscan" }] });
+d.createUser({ user: "openrmftrivyscan", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmftrivyscan" }] });
 d.createCollection("TrivyConfig");
 d.createCollection("TrivyRuns");
 d.TrivyRuns.createIndex({ when: -1 });
 
 // ---- openrmftasks (fork) ----
 d = db.getSiblingDB('openrmftasks');
-d.createUser({ user: "openrmftasks", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmftasks" }] });
+d.createUser({ user: "openrmftasks", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmftasks" }] });
 d.createCollection("Tasks");
 d.Tasks.createIndex({ systemGroupId: 1, status: 1 });
 d.Tasks.createIndex({ assignedTo: 1, status: 1 });
@@ -167,7 +169,7 @@ d.Tasks.createIndex({ dueDate: 1 });
 
 // ---- openrmfinventory (fork) ----
 d = db.getSiblingDB('openrmfinventory');
-d.createUser({ user: "openrmfinventory", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmfinventory" }] });
+d.createUser({ user: "openrmfinventory", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmfinventory" }] });
 d.createCollection("Assets");
 d.Assets.createIndex({ systemGroupId: 1, hostname: 1 });
 d.Assets.createIndex({ systemGroupId: 1, osName: 1 });
@@ -176,20 +178,20 @@ d.OsMappings.createIndex({ priority: 1 });
 
 // ---- openrmfconmon (fork) ----
 d = db.getSiblingDB('openrmfconmon');
-d.createUser({ user: "openrmfconmon", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmfconmon" }] });
+d.createUser({ user: "openrmfconmon", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmfconmon" }] });
 d.createCollection("CadencePolicies");
 d.CadencePolicies.createIndex({ systemGroupId: 1 }, { unique: true });
 
 // ---- openrmfscanwatch (fork) ----
 d = db.getSiblingDB('openrmfscanwatch');
-d.createUser({ user: "openrmfscanwatch", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmfscanwatch" }] });
+d.createUser({ user: "openrmfscanwatch", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmfscanwatch" }] });
 d.createCollection("ProcessedFiles");
 d.ProcessedFiles.createIndex({ path: 1, sha256: 1 });
 d.ProcessedFiles.createIndex({ status: 1, lastAttempt: -1 });
 
 // ---- openrmfjournal (fork: entries + GridFS evidence) ----
 d = db.getSiblingDB('openrmfjournal');
-d.createUser({ user: "openrmfjournal", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmfjournal" }] });
+d.createUser({ user: "openrmfjournal", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmfjournal" }] });
 d.createCollection("JournalEntries");
 d.JournalEntries.createIndex({ systemGroupId: 1, created: -1 });
 d.JournalEntries.createIndex({ entityType: 1, entityId: 1, created: -1 });
@@ -197,7 +199,7 @@ d.JournalEntries.createIndex({ created: -1 });
 
 // ---- openrmfnotify (fork: subscriptions + SMTP config + send log) ----
 d = db.getSiblingDB('openrmfnotify');
-d.createUser({ user: "openrmfnotify", pwd: "REDACTED", roles: [{ role: "readWrite", db: "openrmfnotify" }] });
+d.createUser({ user: "openrmfnotify", pwd: appPassword, roles: [{ role: "readWrite", db: "openrmfnotify" }] });
 d.createCollection("NotifyConfig");
 d.createCollection("Subscriptions");
 d.Subscriptions.createIndex({ userid: 1 });

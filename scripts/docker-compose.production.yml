@@ -1,0 +1,69 @@
+# Production overlay. Use with:
+#   docker compose --env-file .env -f docker-compose.yml -f docker-compose.production.yml up -d
+# It keeps stateful services and APIs on the private Docker network and makes
+# the public web endpoint the sole application entry point. TLS must terminate
+# at the approved external reverse proxy before traffic reaches this container.
+services:
+  openrmf-web:
+    ports:
+      - "127.0.0.1:8080:8080"
+  openrmfapi-read:
+    ports: []
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+  openrmfapi-scanhistory:
+    ports: []
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+  openrmfapi-poam:
+    ports: []
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+  openrmfapi-journal:
+    ports: []
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+  openrmfsvc-trivy:
+    ports: []
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+  openrmfsvc-notify:
+    ports: []
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+  openrmfapi-tasks:
+    ports: []
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+  openrmfapi-oscal:
+    ports: []
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+  openrmfapi-ppsm:
+    ports: []
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+  openrmfapi-inventory:
+    ports: []
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+  openrmfapi-conmon:
+    ports: []
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+  openrmfsvc-scanwatch:
+    ports: []
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+  mongodb:
+    ports: []
+  natsserver:
+    ports: []
+  postgres16:
+    ports: []
+  keycloak:
+    ports:
+      - "127.0.0.1:8081:8080"
+    environment:
+      - KC_HOSTNAME_STRICT=true
+      - KC_HTTP_ENABLED=true

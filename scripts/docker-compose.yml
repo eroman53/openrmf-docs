@@ -1,9 +1,7 @@
-version : '3.8'
- 
 services:
 ### 1 Web Front End Container
   openrmf-web:
-    image: eroman53/openrmf-web:latest
+    image: eroman53/openrmf-web:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     # image: cingulara/openrmf-web:1.14.01-privileged # this is to eventually make HTTPS 443 in a non-privileged manner
     container_name: openrmf-web
     restart: on-failure:5
@@ -34,7 +32,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8090
-      - DBCONNECTION=mongodb://openrmfscore:REDACTED@mongodb/openrmfscore?authSource=openrmfscore
+      - DBCONNECTION=mongodb://openrmfscore:${MONGO_PASSWORD}@mongodb/openrmfscore?authSource=openrmfscore
       - DBTYPE=mongo
       - DB=openrmfscore
       - LOGLEVEL=3
@@ -54,7 +52,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8088
       - NATSSERVERURL=nats://natsserver:4222
-      - DBCONNECTION=mongodb://openrmftemplate:REDACTED@mongodb/openrmftemplate?authSource=openrmftemplate
+      - DBCONNECTION=mongodb://openrmftemplate:${MONGO_PASSWORD}@mongodb/openrmftemplate?authSource=openrmftemplate
       - DB=openrmftemplate
       - DBTYPE=mongo
       - LOGLEVEL=3
@@ -64,7 +62,7 @@ services:
       - openrmf
 
   openrmfapi-read:
-    image: eroman53/openrmf-api-read:latest
+    image: eroman53/openrmf-api-read:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-read-api
     restart: on-failure:5
     ports:
@@ -74,12 +72,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8084
       - NATSSERVERURL=nats://natsserver:4222
-      - DBCONNECTION=mongodb://openrmf:REDACTED@mongodb/openrmf?authSource=openrmf
+      - DBCONNECTION=mongodb://openrmf:${MONGO_PASSWORD}@mongodb/openrmf?authSource=openrmf
       - DB=openrmf
       - DBTYPE=mongo
       - SCANHISTORYAPIURL=http://openrmfapi-scanhistory:8100
       # report DB (read-only): vulnerability full-text search
-      - REPORTDBCONNECTION=mongodb://openrmfreport:REDACTED@mongodb/openrmfreport?authSource=openrmfreport
+      - REPORTDBCONNECTION=mongodb://openrmfreport:${MONGO_PASSWORD}@mongodb/openrmfreport?authSource=openrmfreport
       - REPORTDB=openrmfreport
       - LOGLEVEL=3
     depends_on:
@@ -89,7 +87,7 @@ services:
       - openrmf
 
   openrmfapi-scanhistory:
-    image: eroman53/openrmf-api-scanhistory:latest
+    image: eroman53/openrmf-api-scanhistory:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-scanhistory-api
     restart: on-failure:5
     ports:
@@ -98,10 +96,10 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8100
-      - DBCONNECTION=mongodb://openrmfscanhistory:REDACTED@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
+      - DBCONNECTION=mongodb://openrmfscanhistory:${MONGO_PASSWORD}@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
       - DB=openrmfscanhistory
       - DBTYPE=mongo
-      - SYSTEMDBCONNECTION=mongodb://openrmf:REDACTED@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:${MONGO_PASSWORD}@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
       - LOGLEVEL=3
     depends_on:
@@ -110,7 +108,7 @@ services:
       - openrmf
 
   openrmfapi-poam:
-    image: eroman53/openrmf-api-poam:latest
+    image: eroman53/openrmf-api-poam:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-poam-api
     restart: on-failure:5
     ports:
@@ -120,10 +118,10 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8102
       - NATSSERVERURL=nats://natsserver:4222
-      - DBCONNECTION=mongodb://openrmfpoam:REDACTED@mongodb/openrmfpoam?authSource=openrmfpoam
+      - DBCONNECTION=mongodb://openrmfpoam:${MONGO_PASSWORD}@mongodb/openrmfpoam?authSource=openrmfpoam
       - DB=openrmfpoam
       - DBTYPE=mongo
-      - SYSTEMDBCONNECTION=mongodb://openrmf:REDACTED@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:${MONGO_PASSWORD}@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
       - LOGLEVEL=3
     depends_on:
@@ -133,7 +131,7 @@ services:
       - openrmf
 
   openrmfapi-journal:
-    image: eroman53/openrmf-api-journal:latest
+    image: eroman53/openrmf-api-journal:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-journal-api
     restart: on-failure:5
     ports:
@@ -142,10 +140,10 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8104
-      - DBCONNECTION=mongodb://openrmfjournal:REDACTED@mongodb/openrmfjournal?authSource=openrmfjournal
+      - DBCONNECTION=mongodb://openrmfjournal:${MONGO_PASSWORD}@mongodb/openrmfjournal?authSource=openrmfjournal
       - DB=openrmfjournal
       - DBTYPE=mongo
-      - SYSTEMDBCONNECTION=mongodb://openrmf:REDACTED@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:${MONGO_PASSWORD}@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
       - LOGLEVEL=3
     depends_on:
@@ -178,7 +176,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8096
-      - DBCONNECTION=mongodb://openrmfaudit:REDACTED@mongodb/openrmfaudit?authSource=openrmfaudit
+      - DBCONNECTION=mongodb://openrmfaudit:${MONGO_PASSWORD}@mongodb/openrmfaudit?authSource=openrmfaudit
       - DB=openrmfaudit
       - DBTYPE=mongo
       - NATSSERVERURL=nats://natsserver:4222
@@ -198,7 +196,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8098
-      - DBCONNECTION=mongodb://openrmfreport:REDACTED@mongodb/openrmfreport?authSource=openrmfreport
+      - DBCONNECTION=mongodb://openrmfreport:${MONGO_PASSWORD}@mongodb/openrmfreport?authSource=openrmfreport
       - DB=openrmfreport
       - DBTYPE=mongo
       - NATSSERVERURL=nats://natsserver:4222
@@ -214,7 +212,7 @@ services:
     container_name: openrmf-score-nats-message-client
     restart: on-failure:5
     environment:
-      - DBCONNECTION=mongodb://openrmfscore:REDACTED@mongodb/openrmfscore?authSource=openrmfscore
+      - DBCONNECTION=mongodb://openrmfscore:${MONGO_PASSWORD}@mongodb/openrmfscore?authSource=openrmfscore
       - DBTYPE=mongo
       - DB=openrmfscore
       - NATSSERVERURL=nats://natsserver:4222
@@ -254,7 +252,7 @@ services:
     container_name: openrmf-template-nats-message-client
     restart: on-failure:5
     environment:
-      - DBCONNECTION=mongodb://openrmftemplate:REDACTED@mongodb/openrmftemplate?authSource=openrmftemplate
+      - DBCONNECTION=mongodb://openrmftemplate:${MONGO_PASSWORD}@mongodb/openrmftemplate?authSource=openrmftemplate
       - DB=openrmftemplate
       - DBTYPE=mongo
       - NATSSERVERURL=nats://natsserver:4222
@@ -270,7 +268,7 @@ services:
     container_name: openrmf-system-nats-message-client
     restart: on-failure:5
     environment:
-      - DBCONNECTION=mongodb://openrmf:REDACTED@mongodb/openrmf?authSource=openrmf
+      - DBCONNECTION=mongodb://openrmf:${MONGO_PASSWORD}@mongodb/openrmf?authSource=openrmf
       - DB=openrmf
       - DBTYPE=mongo
       - NATSSERVERURL=nats://natsserver:4222
@@ -290,29 +288,29 @@ services:
   # replaces: each module still connects to its own database with its own
   # credentials.
   openrmfmsg-hub:
-    image: eroman53/openrmf-msg-hub:latest
+    image: eroman53/openrmf-msg-hub:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-message-hub
     restart: on-failure:5
     environment:
       # shared: the checklist/system database every module reads
-      - SYSTEMDBCONNECTION=mongodb://openrmf:REDACTED@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:${MONGO_PASSWORD}@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
       - SYSTEMDBTYPE=mongo
       # inventory module
-      - INVENTORYDBCONNECTION=mongodb://openrmfinventory:REDACTED@mongodb/openrmfinventory?authSource=openrmfinventory
+      - INVENTORYDBCONNECTION=mongodb://openrmfinventory:${MONGO_PASSWORD}@mongodb/openrmfinventory?authSource=openrmfinventory
       - INVENTORYDB=openrmfinventory
       # journal module
-      - JOURNALDBCONNECTION=mongodb://openrmfjournal:REDACTED@mongodb/openrmfjournal?authSource=openrmfjournal
+      - JOURNALDBCONNECTION=mongodb://openrmfjournal:${MONGO_PASSWORD}@mongodb/openrmfjournal?authSource=openrmfjournal
       - JOURNALDB=openrmfjournal
       # POA&M module
-      - POAMDBCONNECTION=mongodb://openrmfpoam:REDACTED@mongodb/openrmfpoam?authSource=openrmfpoam
+      - POAMDBCONNECTION=mongodb://openrmfpoam:${MONGO_PASSWORD}@mongodb/openrmfpoam?authSource=openrmfpoam
       - POAMDB=openrmfpoam
       # reports module
-      - REPORTDBCONNECTION=mongodb://openrmfreport:REDACTED@mongodb/openrmfreport?authSource=openrmfreport
+      - REPORTDBCONNECTION=mongodb://openrmfreport:${MONGO_PASSWORD}@mongodb/openrmfreport?authSource=openrmfreport
       - REPORTDB=openrmfreport
       - REPORTDBTYPE=mongo
       # shared by inventory, POA&M and reports
-      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:REDACTED@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
+      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:${MONGO_PASSWORD}@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
       - SCANHISTORYDB=openrmfscanhistory
       - NATSSERVERURL=nats://natsserver:4222
       - LOGLEVEL=3
@@ -329,7 +327,7 @@ services:
     container_name: openrmf-audit-nats-message-client
     restart: on-failure:5
     environment:
-      - DBCONNECTION=mongodb://openrmfaudit:REDACTED@mongodb/openrmfaudit?authSource=openrmfaudit
+      - DBCONNECTION=mongodb://openrmfaudit:${MONGO_PASSWORD}@mongodb/openrmfaudit?authSource=openrmfaudit
       - DB=openrmfaudit
       - DBTYPE=mongo
       - NATSSERVERURL=nats://natsserver:4222
@@ -341,7 +339,7 @@ services:
       - openrmf
 
   openrmfsvc-trivy:
-    image: eroman53/openrmf-svc-trivy:latest
+    image: eroman53/openrmf-svc-trivy:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-trivy-scanner
     restart: on-failure:5
     ports:
@@ -350,10 +348,10 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8114
-      - DBCONNECTION=mongodb://openrmftrivyscan:REDACTED@mongodb/openrmftrivyscan?authSource=openrmftrivyscan
+      - DBCONNECTION=mongodb://openrmftrivyscan:${MONGO_PASSWORD}@mongodb/openrmftrivyscan?authSource=openrmftrivyscan
       - DB=openrmftrivyscan
       # read-only view of the checklist DB so the API can enforce package-level RBAC
-      - SYSTEMDBCONNECTION=mongodb://openrmf:REDACTED@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:${MONGO_PASSWORD}@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
       - SCANHISTORYAPIURL=http://openrmfapi-scanhistory:8100
       - KEYCLOAKTOKENURL=http://openrmf-keycloak:8080/auth/realms/openrmf/protocol/openid-connect/token
@@ -376,7 +374,7 @@ services:
       - openrmf
 
   openrmfsvc-notify:
-    image: eroman53/openrmf-svc-notify:latest
+    image: eroman53/openrmf-svc-notify:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-notify
     restart: on-failure:5
     ports:
@@ -385,12 +383,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8116
-      - DBCONNECTION=mongodb://openrmfnotify:REDACTED@mongodb/openrmfnotify?authSource=openrmfnotify
+      - DBCONNECTION=mongodb://openrmfnotify:${MONGO_PASSWORD}@mongodb/openrmfnotify?authSource=openrmfnotify
       - DB=openrmfnotify
       - DBTYPE=mongo
       - NATSSERVERURL=nats://natsserver:4222
       # checklist DB: resolve artifact->system + read package RBAC grants
-      - SYSTEMDBCONNECTION=mongodb://openrmf:REDACTED@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:${MONGO_PASSWORD}@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
       # ConMon posture for the weekly digest (service-account call bypasses RBAC)
       - CONMONAPIURL=http://openrmfapi-conmon:8108
@@ -406,7 +404,7 @@ services:
       - openrmf
 
   openrmfapi-tasks:
-    image: eroman53/openrmf-api-tasks:latest
+    image: eroman53/openrmf-api-tasks:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-tasks-api
     restart: on-failure:5
     ports:
@@ -415,10 +413,10 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8112
-      - DBCONNECTION=mongodb://openrmftasks:REDACTED@mongodb/openrmftasks?authSource=openrmftasks
+      - DBCONNECTION=mongodb://openrmftasks:${MONGO_PASSWORD}@mongodb/openrmftasks?authSource=openrmftasks
       - DB=openrmftasks
       - DBTYPE=mongo
-      - SYSTEMDBCONNECTION=mongodb://openrmf:REDACTED@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:${MONGO_PASSWORD}@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
       - LOGLEVEL=3
     depends_on:
@@ -427,7 +425,7 @@ services:
       - openrmf
 
   openrmfapi-oscal:
-    image: eroman53/openrmf-api-oscal:latest
+    image: eroman53/openrmf-api-oscal:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-oscal-api
     restart: on-failure:5
     ports:
@@ -436,12 +434,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8120
-      - DBCONNECTION=mongodb://openrmfoscal:REDACTED@mongodb/openrmfoscal?authSource=openrmfoscal
+      - DBCONNECTION=mongodb://openrmfoscal:${MONGO_PASSWORD}@mongodb/openrmfoscal?authSource=openrmfoscal
       - DB=openrmfoscal
       - DBTYPE=mongo
       # read-only view of the checklist DB: the per-system profile endpoints are
       # package-scoped and enforce the usual package RBAC grants
-      - SYSTEMDBCONNECTION=mongodb://openrmf:REDACTED@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:${MONGO_PASSWORD}@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
       - LOGLEVEL=3
     depends_on:
@@ -450,7 +448,7 @@ services:
       - openrmf
 
   openrmfapi-ppsm:
-    image: eroman53/openrmf-api-ppsm:latest
+    image: eroman53/openrmf-api-ppsm:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-ppsm-api
     restart: on-failure:5
     ports:
@@ -459,13 +457,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8118
-      - DBCONNECTION=mongodb://openrmfppsm:REDACTED@mongodb/openrmfppsm?authSource=openrmfppsm
+      - DBCONNECTION=mongodb://openrmfppsm:${MONGO_PASSWORD}@mongodb/openrmfppsm?authSource=openrmfppsm
       - DB=openrmfppsm
       - DBTYPE=mongo
       # read-only cross-service view of scan-observed open ports for reconciliation
-      - SYSTEMDBCONNECTION=mongodb://openrmf:REDACTED@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:${MONGO_PASSWORD}@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
-      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:REDACTED@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
+      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:${MONGO_PASSWORD}@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
       - SCANHISTORYDB=openrmfscanhistory
       - LOGLEVEL=3
     depends_on:
@@ -474,7 +472,7 @@ services:
       - openrmf
 
   openrmfapi-inventory:
-    image: eroman53/openrmf-api-inventory:latest
+    image: eroman53/openrmf-api-inventory:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-inventory-api
     restart: on-failure:5
     ports:
@@ -483,13 +481,13 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8110
-      - DBCONNECTION=mongodb://openrmfinventory:REDACTED@mongodb/openrmfinventory?authSource=openrmfinventory
+      - DBCONNECTION=mongodb://openrmfinventory:${MONGO_PASSWORD}@mongodb/openrmfinventory?authSource=openrmfinventory
       - DB=openrmfinventory
       - DBTYPE=mongo
       # read-only cross-service views for reconciliation and fleet findings
-      - SYSTEMDBCONNECTION=mongodb://openrmf:REDACTED@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:${MONGO_PASSWORD}@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
-      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:REDACTED@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
+      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:${MONGO_PASSWORD}@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
       - SCANHISTORYDB=openrmfscanhistory
       - LOGLEVEL=3
     depends_on:
@@ -498,7 +496,7 @@ services:
       - openrmf
 
   openrmfapi-conmon:
-    image: eroman53/openrmf-api-conmon:latest
+    image: eroman53/openrmf-api-conmon:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-conmon-api
     restart: on-failure:5
     ports:
@@ -507,25 +505,25 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://*:8108
-      - DBCONNECTION=mongodb://openrmfconmon:REDACTED@mongodb/openrmfconmon?authSource=openrmfconmon
+      - DBCONNECTION=mongodb://openrmfconmon:${MONGO_PASSWORD}@mongodb/openrmfconmon?authSource=openrmfconmon
       - DB=openrmfconmon
       - DBTYPE=mongo
       # read-only cross-service views for posture computation
-      - SYSTEMDBCONNECTION=mongodb://openrmf:REDACTED@mongodb/openrmf?authSource=openrmf
+      - SYSTEMDBCONNECTION=mongodb://openrmf:${MONGO_PASSWORD}@mongodb/openrmf?authSource=openrmf
       - SYSTEMDB=openrmf
-      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:REDACTED@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
+      - SCANHISTORYDBCONNECTION=mongodb://openrmfscanhistory:${MONGO_PASSWORD}@mongodb/openrmfscanhistory?authSource=openrmfscanhistory
       - SCANHISTORYDB=openrmfscanhistory
-      - POAMDBCONNECTION=mongodb://openrmfpoam:REDACTED@mongodb/openrmfpoam?authSource=openrmfpoam
+      - POAMDBCONNECTION=mongodb://openrmfpoam:${MONGO_PASSWORD}@mongodb/openrmfpoam?authSource=openrmfpoam
       - POAMDB=openrmfpoam
-      - TEMPLATEDBCONNECTION=mongodb://openrmftemplate:REDACTED@mongodb/openrmftemplate?authSource=openrmftemplate
+      - TEMPLATEDBCONNECTION=mongodb://openrmftemplate:${MONGO_PASSWORD}@mongodb/openrmftemplate?authSource=openrmftemplate
       - TEMPLATEDB=openrmftemplate
       # asset registry: canonical host identity for coverage reconciliation
       # (optional -- coverage degrades to raw hostname matching if unset)
-      - INVENTORYDBCONNECTION=mongodb://openrmfinventory:REDACTED@mongodb/openrmfinventory?authSource=openrmfinventory
+      - INVENTORYDBCONNECTION=mongodb://openrmfinventory:${MONGO_PASSWORD}@mongodb/openrmfinventory?authSource=openrmfinventory
       - INVENTORYDB=openrmfinventory
       # 800-53 control assessment: which controls are overdue, unscheduled or
       # never assessed (optional -- posture reports "not configured" if unset)
-      - OSCALDBCONNECTION=mongodb://openrmfoscal:REDACTED@mongodb/openrmfoscal?authSource=openrmfoscal
+      - OSCALDBCONNECTION=mongodb://openrmfoscal:${MONGO_PASSWORD}@mongodb/openrmfoscal?authSource=openrmfoscal
       - OSCALDB=openrmfoscal
       - LOGLEVEL=3
     depends_on:
@@ -534,7 +532,7 @@ services:
       - openrmf
 
   openrmfsvc-scanwatch:
-    image: eroman53/openrmf-svc-scanwatch:latest
+    image: eroman53/openrmf-svc-scanwatch:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-scanwatch
     restart: on-failure:5
     ports:
@@ -549,7 +547,7 @@ services:
       - KEYCLOAKTOKENURL=http://openrmf-keycloak:8080/auth/realms/openrmf/protocol/openid-connect/token
       - CLIENTID=openrmf-scanwatch
       - CLIENTSECRET=${SCANWATCH_CLIENTSECRET}
-      - DBCONNECTION=mongodb://openrmfscanwatch:REDACTED@mongodb/openrmfscanwatch?authSource=openrmfscanwatch
+      - DBCONNECTION=mongodb://openrmfscanwatch:${MONGO_PASSWORD}@mongodb/openrmfscanwatch?authSource=openrmfscanwatch
       - DB=openrmfscanwatch
       - LOGLEVEL=2
     depends_on:
@@ -565,9 +563,10 @@ services:
     ports:
       - "27017"
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=REDACTED
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
       - MONGO_INITDB_DATABASE=openrmf
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
     volumes:
       - mongo-data-volume:/data/db
       - ./initializeAll.js:/docker-entrypoint-initdb.d/initialize.js:Z
@@ -683,7 +682,7 @@ services:
     environment:
       - POSTGRES_DB=openrmf-keycloak 
       - POSTGRES_USER=openrmf-keycloak 
-      - POSTGRES_PASSWORD=REDACTED
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
       - openrmf
     volumes:
@@ -704,9 +703,9 @@ services:
       - KC_DB=postgres
       - KC_DB_URL=jdbc:postgresql://openrmf-postgres16:5432/openrmf-keycloak
       - KC_DB_USERNAME=openrmf-keycloak
-      - KC_DB_PASSWORD=REDACTED
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=REDACTED
+      - KC_DB_PASSWORD=${POSTGRES_PASSWORD}
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
       - KC_HOSTNAME_STRICT=false
       - KC_PROXY_HEADERS=xforwarded
       - KC_HTTP_RELATIVE_PATH=/auth

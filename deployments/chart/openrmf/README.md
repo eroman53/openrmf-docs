@@ -154,10 +154,10 @@ All of the values used in these are in the values.yaml file so you can define yo
 
 ```yaml
 checklistInitDBUser: root
-checklistInitDBPassword: REDACTED
+checklistInitDBPassword: ${MONGO_ROOT_PASSWORD}
 checklistInitDBName: openrmf
 checklistAppUser: openrmf
-checklistAppPassword: REDACTED
+checklistAppPassword: ${MONGO_PASSWORD}
 ```
 
 ## Network Policies

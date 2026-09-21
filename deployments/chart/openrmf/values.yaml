@@ -77,7 +77,7 @@ templatedbtype: mongo
 
 # Database initialization Scripts
 checklistAppUser: openrmf
-checklistAppPassword: REDACTED
+checklistAppPassword: ${MONGO_PASSWORD}
 templateAppUser: openrmftemplate
 templateAppPassword: openrmf4321!
 scoreAppUser: openrmfscore

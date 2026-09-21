@@ -1,11 +1,13 @@
+var appPassword = process.env.MONGO_PASSWORD;
+if (!appPassword) throw new Error("MONGO_PASSWORD must be supplied when initializing STOOGE databases");
 db = db.getSiblingDB('admin');
-db.createUser({ user: "openrmf" , pwd: "REDACTED", roles: ["readWriteAnyDatabase"]});
-db.createUser({ user: "openrmftemplate" , pwd: "REDACTED", roles: ["readWriteAnyDatabase"]});
-db.createUser({ user: "openrmfscore" , pwd: "REDACTED", roles: ["readWriteAnyDatabase"]});
-db.createUser({ user: "openrmfaudit" , pwd: "REDACTED", roles: ["readWriteAnyDatabase"]});
-db.createUser({ user: "openrmfreport" , pwd: "REDACTED", roles: ["readWriteAnyDatabase"]});
-db.createUser({ user: "openrmfscanhistory" , pwd: "REDACTED", roles: ["readWriteAnyDatabase"]});
-db.createUser({ user: "openrmfpoam" , pwd: "REDACTED", roles: ["readWriteAnyDatabase"]});
+db.createUser({ user: "openrmf" , pwd: appPassword, roles: ["readWriteAnyDatabase"]});
+db.createUser({ user: "openrmftemplate" , pwd: appPassword, roles: ["readWriteAnyDatabase"]});
+db.createUser({ user: "openrmfscore" , pwd: appPassword, roles: ["readWriteAnyDatabase"]});
+db.createUser({ user: "openrmfaudit" , pwd: appPassword, roles: ["readWriteAnyDatabase"]});
+db.createUser({ user: "openrmfreport" , pwd: appPassword, roles: ["readWriteAnyDatabase"]});
+db.createUser({ user: "openrmfscanhistory" , pwd: appPassword, roles: ["readWriteAnyDatabase"]});
+db.createUser({ user: "openrmfpoam" , pwd: appPassword, roles: ["readWriteAnyDatabase"]});
 db = db.getSiblingDB('openrmf');
 db.createCollection("Artifacts");
 db.Artifacts.createIndex({ systemGroupId: 1 })
