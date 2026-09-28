@@ -198,7 +198,7 @@
  * for 30 days.
  */
 #kc-header-wrapper::after {
-    content: "v0.9.0-beta";
+    content: "v0.9.0-rc.1";
     display: block;
     margin: 10px 0 0;
     font-family: "Cascadia Mono", Consolas, ui-monospace, monospace;
