@@ -1,5 +1,7 @@
 # syntax=docker/dockerfile:1.7
-FROM quay.io/keycloak/keycloak:26.7.4 AS builder
+ARG STOOGE_KEYCLOAK_BASE=quay.io/keycloak/keycloak:26.7.4
+ARG STOOGE_UBI_BASE=registry.access.redhat.com/ubi9/ubi-minimal:9.8
+FROM ${STOOGE_KEYCLOAK_BASE} AS builder
 
 # Enable health and metrics support
 ENV KC_HEALTH_ENABLED=true
@@ -40,7 +42,27 @@ COPY ./themes/openrmf/ /opt/keycloak/themes/openrmf/
 COPY ./themes/stooge/ /opt/keycloak/themes/stooge/
 RUN /opt/keycloak/bin/kc.sh build --spi-x509cert-lookup-provider=nginx
 
-FROM quay.io/keycloak/keycloak:26.7.4
-COPY --from=builder /opt/keycloak/ /opt/keycloak/
+# The Keycloak runtime omits rpm tooling. Import its existing Red Hat key in a
+# separate UBI stage and copy only the updated package database to the runtime.
+FROM ${STOOGE_UBI_BASE} AS keydb
+USER 0
+COPY --from=builder /var/lib/rpm/ /var/lib/rpm/
+COPY --from=builder /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release /tmp/RPM-GPG-KEY-redhat-release
+RUN rpm --import /tmp/RPM-GPG-KEY-redhat-release \
+ && rpm -q gpg-pubkey \
+ && printf '%s\n' \
+      'cipher@SSH=AES-256-GCM AES-256-CTR AES-128-GCM AES-128-CTR' \
+      'mac@SSH=HMAC-SHA2-512 HMAC-SHA2-256' \
+      > /etc/crypto-policies/policies/modules/STIG.pmod \
+ && update-crypto-policies --no-reload --set FIPS:STIG
 
+FROM ${STOOGE_KEYCLOAK_BASE}
+USER 0
+COPY --from=keydb /var/lib/rpm/ /var/lib/rpm/
+COPY --from=keydb /etc/crypto-policies/ /etc/crypto-policies/
+COPY --from=builder /opt/keycloak/ /opt/keycloak/
+RUN sed -i 's/umask 022/umask 077/g' /etc/bashrc \
+ && printf '%s\n' 'umask 077' >> /etc/profile
+
+USER 1000
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
