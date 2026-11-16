@@ -1,0 +1,16 @@
+# Local remediation overlay. Build these images first with STOOGE-docs scripts.
+services:
+  openrmfapi-controls:
+    image: stooge-local/openrmf-api-controls:registry1-ubi9
+  openrmfapi-scoring:
+    image: stooge-local/openrmf-api-scoring:registry1-ubi9
+  openrmfapi-template:
+    image: stooge-local/openrmf-api-template:registry1-ubi9
+  openrmfapi-audit:
+    image: stooge-local/openrmf-api-audit:registry1-ubi9
+  openrmfapi-report:
+    image: stooge-local/openrmf-api-report:registry1-ubi9
+  mongodb:
+    image: stooge-local/mongo:7.0.45-jammy-nonroot
+  postgres16:
+    image: stooge-local/postgres:16.15-alpine3.23-nonroot
