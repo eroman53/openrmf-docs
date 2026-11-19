@@ -10,6 +10,30 @@ services:
     image: stooge-local/openrmf-api-audit:registry1-ubi9
   openrmfapi-report:
     image: stooge-local/openrmf-api-report:registry1-ubi9
+  # The upstream 1.14.01 listener images contain an obsolete Alpine OpenSSH
+  # package.  These local derivatives retain the upstream application binary
+  # and run the supported package upgrade only.
+  openrmfmsg-score:
+    image: stooge-local/openrmf-msg-score:hardened
+  openrmfmsg-compliance:
+    image: stooge-local/openrmf-msg-compliance:hardened
+  openrmfmsg-controls:
+    image: stooge-local/openrmf-msg-controls:hardened
+  openrmfmsg-template:
+    image: stooge-local/openrmf-msg-template:hardened
+  openrmfmsg-system:
+    image: stooge-local/openrmf-msg-system:hardened
+  openrmfmsg-audit:
+    image: stooge-local/openrmf-msg-audit:hardened
+  # The local Registry1-derived Keycloak image remediates the current
+  # Keycloak critical findings.  The database was backed up before adoption.
+  keycloak:
+    image: stooge-local/keycloak-stooge:registry1-ubi9
+    environment:
+      # CVE-2026-114938 has no vendor package fix yet.  Its affected path
+      # requires AVX-512 VBMI, so limit HotSpot to AVX2 until Red Hat ships a
+      # fixed OpenJDK package.  The rebuilt Iron Bank base is OpenJDK 21.0.13.
+      JAVA_OPTS_APPEND: -XX:UseAVX=2
   mongodb:
     image: stooge-local/mongo:7.0.45-jammy-nonroot
   postgres16:

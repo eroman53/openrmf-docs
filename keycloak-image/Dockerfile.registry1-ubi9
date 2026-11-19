@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-# Private local build from a digest-pinned Registry1 Keycloak 26.8.1 image.
+# Private local build from a digest-pinned Registry1 Keycloak 26.8.2 image.
 # The upstream distribution already includes the corrected Netty, Bouncy Castle,
 # Jackson, and FreeMarker dependencies; do not copy the old 26.7.4 JAR overlay.
 ARG STOOGE_KEYCLOAK_BASE
@@ -17,8 +17,8 @@ ENV KC_HEALTH_ENABLED=true \
 USER 1000
 COPY ./themes/openrmf/ /opt/keycloak/themes/openrmf/
 COPY ./themes/stooge/ /opt/keycloak/themes/stooge/
-RUN case "$(/opt/keycloak/bin/kc.sh --version)" in *26.8.1*) ;; *) exit 1 ;; esac \
- && test -f /opt/keycloak/lib/lib/main/io.netty.netty-handler-4.1.138.Final.jar \
+RUN case "$(/opt/keycloak/bin/kc.sh --version)" in *26.8.2*) ;; *) exit 1 ;; esac \
+ && test -f /opt/keycloak/lib/lib/main/io.netty.netty-handler-4.1.139.Final.jar \
  && test -f /opt/keycloak/lib/lib/main/org.bouncycastle.bcprov-jdk18on-1.86.jar \
  && test -f /opt/keycloak/lib/lib/main/org.bouncycastle.bcpkix-jdk18on-1.86.jar \
  && test -f /opt/keycloak/lib/lib/main/org.bouncycastle.bcutil-jdk18on-1.86.jar \
