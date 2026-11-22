@@ -34,6 +34,8 @@ services:
       # requires AVX-512 VBMI, so limit HotSpot to AVX2 until Red Hat ships a
       # fixed OpenJDK package.  The rebuilt Iron Bank base is OpenJDK 21.0.13.
       JAVA_OPTS_APPEND: -XX:UseAVX=2
+  natsserver:
+    image: nats:2.12.15-alpine3.22
   mongodb:
     image: stooge-local/mongo:7.0.45-jammy-nonroot
   postgres16:

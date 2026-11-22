@@ -1,0 +1,33 @@
+# Local beta release overlay for the rebuilt first-party STOOGE application
+# images.  Build with STOOGE-docs/scripts/build-ironbank-all-local.ps1 first.
+# Keycloak remains in docker-compose.hardened-local.yml because it is managed
+# separately and has a database migration lifecycle.
+services:
+  openrmf-web:
+    image: stooge-local/openrmf-web:registry1-ubi9
+  openrmfapi-read:
+    image: stooge-local/openrmf-api-read:registry1-ubi9
+  openrmfapi-scanhistory:
+    image: stooge-local/openrmf-api-scanhistory:registry1-ubi9
+  openrmfapi-poam:
+    image: stooge-local/openrmf-api-poam:registry1-ubi9
+  openrmfapi-journal:
+    image: stooge-local/openrmf-api-journal:registry1-ubi9
+  openrmfapi-tasks:
+    image: stooge-local/openrmf-api-tasks:registry1-ubi9
+  openrmfapi-ppsm:
+    image: stooge-local/openrmf-api-ppsm:registry1-ubi9
+  openrmfapi-oscal:
+    image: stooge-local/openrmf-api-oscal:registry1-ubi9
+  openrmfapi-inventory:
+    image: stooge-local/openrmf-api-inventory:registry1-ubi9
+  openrmfapi-conmon:
+    image: stooge-local/openrmf-api-conmon:registry1-ubi9
+  openrmfsvc-notify:
+    image: stooge-local/openrmf-svc-notify:registry1-ubi9
+  openrmfsvc-scanwatch:
+    image: stooge-local/openrmf-svc-scanwatch:registry1-ubi9
+  openrmfsvc-trivy:
+    image: stooge-local/openrmf-svc-trivy:registry1-ubi9
+  openrmfmsg-hub:
+    image: stooge-local/openrmf-msg-hub:registry1-ubi9
