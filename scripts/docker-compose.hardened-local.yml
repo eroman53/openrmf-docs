@@ -28,7 +28,7 @@ services:
   # The local Registry1-derived Keycloak image remediates the current
   # Keycloak critical findings.  The database was backed up before adoption.
   keycloak:
-    image: stooge-local/keycloak-stooge:registry1-ubi9
+    image: stooge-local/keycloak-stooge:hardening-20261125
     environment:
       # CVE-2026-114938 has no vendor package fix yet.  Its affected path
       # requires AVX-512 VBMI, so limit HotSpot to AVX2 until Red Hat ships a

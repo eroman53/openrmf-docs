@@ -5,6 +5,8 @@ services:
     # image: cingulara/openrmf-web:1.14.01-privileged # this is to eventually make HTTPS 443 in a non-privileged manner
     container_name: openrmf-web
     restart: on-failure:5
+    security_opt:
+      - no-new-privileges:true
     ports:
       - 8080:8080
       # - 8443:8443
@@ -34,7 +36,10 @@ services:
     image: docker.io/cingulara/openrmf-api-scoring:1.14.02
     container_name: openrmf-scoring-api
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8090"
     env_file: .env
     environment:
@@ -53,7 +58,10 @@ services:
     image: docker.io/cingulara/openrmf-api-template:1.14.04
     container_name: openrmf-template-api
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8088"
     env_file: .env
     environment:
@@ -73,7 +81,10 @@ services:
     image: eroman53/openrmf-api-read:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-read-api
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8084"
     env_file: .env
     environment:
@@ -98,7 +109,10 @@ services:
     image: eroman53/openrmf-api-scanhistory:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-scanhistory-api
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8100"
     env_file: .env
     environment:
@@ -119,7 +133,10 @@ services:
     image: eroman53/openrmf-api-poam:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-poam-api
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8102"
     env_file: .env
     environment:
@@ -142,7 +159,10 @@ services:
     image: eroman53/openrmf-api-journal:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-journal-api
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8104"
     env_file: .env
     environment:
@@ -163,7 +183,10 @@ services:
     image: docker.io/cingulara/openrmf-api-controls:1.14.02
     container_name: openrmf-controls-api
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8094"
     env_file: .env
     environment:
@@ -178,7 +201,10 @@ services:
     image: docker.io/cingulara/openrmf-api-audit:1.14.02
     container_name: openrmf-audit-api
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8096"
     env_file: .env
     environment:
@@ -198,7 +224,10 @@ services:
     image: docker.io/cingulara/openrmf-api-report:1.14.02
     container_name: openrmf-report-api
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8098"
     env_file: .env
     environment:
@@ -219,6 +248,8 @@ services:
     image: docker.io/cingulara/openrmf-msg-score:1.14.01
     container_name: openrmf-score-nats-message-client
     restart: on-failure:5
+    security_opt:
+      - no-new-privileges:true
     environment:
       - DBCONNECTION=mongodb://openrmfscore:${MONGO_PASSWORD}@mongodb/openrmfscore?authSource=openrmfscore
       - DBTYPE=mongo
@@ -235,6 +266,8 @@ services:
     image: docker.io/cingulara/openrmf-msg-compliance:1.14.01
     container_name: openrmf-compliance-nats-message-client
     restart: on-failure:5
+    security_opt:
+      - no-new-privileges:true
     environment:
       - NATSSERVERURL=nats://natsserver:4222
       - LOGLEVEL=3
@@ -247,6 +280,8 @@ services:
     image: docker.io/cingulara/openrmf-msg-controls:1.14.01
     container_name: openrmf-controls-nats-message-client
     restart: on-failure:5
+    security_opt:
+      - no-new-privileges:true
     environment:
       - NATSSERVERURL=nats://natsserver:4222
       - LOGLEVEL=3
@@ -259,6 +294,8 @@ services:
     image: docker.io/cingulara/openrmf-msg-template:1.14.01
     container_name: openrmf-template-nats-message-client
     restart: on-failure:5
+    security_opt:
+      - no-new-privileges:true
     environment:
       - DBCONNECTION=mongodb://openrmftemplate:${MONGO_PASSWORD}@mongodb/openrmftemplate?authSource=openrmftemplate
       - DB=openrmftemplate
@@ -275,6 +312,8 @@ services:
     image: docker.io/cingulara/openrmf-msg-system:1.14.01
     container_name: openrmf-system-nats-message-client
     restart: on-failure:5
+    security_opt:
+      - no-new-privileges:true
     environment:
       - DBCONNECTION=mongodb://openrmf:${MONGO_PASSWORD}@mongodb/openrmf?authSource=openrmf
       - DB=openrmf
@@ -299,6 +338,8 @@ services:
     image: eroman53/openrmf-msg-hub:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-message-hub
     restart: on-failure:5
+    security_opt:
+      - no-new-privileges:true
     environment:
       # shared: the checklist/system database every module reads
       - SYSTEMDBCONNECTION=mongodb://openrmf:${MONGO_PASSWORD}@mongodb/openrmf?authSource=openrmf
@@ -334,6 +375,8 @@ services:
     image: docker.io/cingulara/openrmf-msg-audit:1.14.01
     container_name: openrmf-audit-nats-message-client
     restart: on-failure:5
+    security_opt:
+      - no-new-privileges:true
     environment:
       - DBCONNECTION=mongodb://openrmfaudit:${MONGO_PASSWORD}@mongodb/openrmfaudit?authSource=openrmfaudit
       - DB=openrmfaudit
@@ -350,7 +393,10 @@ services:
     image: eroman53/openrmf-svc-trivy:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-trivy-scanner
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8114"
     env_file: .env
     environment:
@@ -385,7 +431,10 @@ services:
     image: eroman53/openrmf-svc-notify:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-notify
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8116"
     env_file: .env
     environment:
@@ -415,7 +464,10 @@ services:
     image: eroman53/openrmf-api-tasks:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-tasks-api
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8112"
     env_file: .env
     environment:
@@ -436,7 +488,10 @@ services:
     image: eroman53/openrmf-api-oscal:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-oscal-api
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8120"
     env_file: .env
     environment:
@@ -459,7 +514,10 @@ services:
     image: eroman53/openrmf-api-ppsm:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-ppsm-api
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8118"
     env_file: .env
     environment:
@@ -483,7 +541,10 @@ services:
     image: eroman53/openrmf-api-inventory:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-inventory-api
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8110"
     env_file: .env
     environment:
@@ -507,7 +568,10 @@ services:
     image: eroman53/openrmf-api-conmon:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-conmon-api
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8108"
     env_file: .env
     environment:
@@ -543,7 +607,10 @@ services:
     image: eroman53/openrmf-svc-scanwatch:${STOOGE_IMAGE_TAG:?Set STOOGE_IMAGE_TAG in scripts/.env}
     container_name: openrmf-scanwatch
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8106"
     env_file: .env
     environment:
@@ -568,7 +635,10 @@ services:
     image: docker.io/cingulara/mongo:7.0.43-jammy-nonroot
     container_name: mongodb
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "27017"
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
@@ -586,7 +656,10 @@ services:
     container_name: nats
     command: -m 8222
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "4222"
       - "6222"
       - "8222"
@@ -603,7 +676,10 @@ services:
     container_name: nats-prometheus-exporter
     command: -varz -connz -subz http://natsserver:8222
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "7777"
     networks:
       - openrmf
@@ -616,7 +692,10 @@ services:
     image: docker.io/cingulara/nats-client-metrics:2.1.3
     container_name: nats-client-metrics
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "7778"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -633,11 +712,14 @@ services:
     image: docker.io/nginx/nginx-prometheus-exporter:1.5.1
     container_name: nginx-metrics
     restart: on-failure:1000
+    security_opt:
+      - no-new-privileges:true
     command:
       - -nginx.scrape-uri
       - http://openrmf-web:8080/status
       # - https://openrmf-web:8443/status
-    ports:
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "9113"
     # environment:
     #   - SSL_VERIFY=false # do not verify on any SSL self signed cert for the web UI
@@ -655,7 +737,10 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--web.enable-lifecycle'
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "9090"
     volumes:
       - openrmf-prometheus-data-volume:/prometheus # persist the data
@@ -672,7 +757,10 @@ services:
     container_name: grafana
     env_file: .grafana
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "3000"
     volumes:
       - openrmf-grafana-data-volume:/var/lib/grafana # persist the data
@@ -685,7 +773,10 @@ services:
     image: docker.io/postgres:16.13-alpine3.23
     container_name: openrmf-postgres16
     restart: on-failure:5
-    ports:
+    security_opt:
+      - no-new-privileges:true
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "5432"
     environment:
       - POSTGRES_DB=openrmf-keycloak 
@@ -702,6 +793,8 @@ services:
     #   docker build -t eroman53/keycloak-stooge:${STOOGE_KEYCLOAK_IMAGE_TAG:-26.7.4} ../keycloak-image
     image: eroman53/keycloak-stooge:${STOOGE_KEYCLOAK_IMAGE_TAG:-26.7.4}
     restart: on-failure:10
+    security_opt:
+      - no-new-privileges:true
     command:
       - start
       - --optimized
@@ -713,7 +806,8 @@ services:
       timeout: 3s
       start_period: 60s
       retries: 24
-    ports:
+    # Internal listener only; do not publish a random host port.
+    expose:
       - "8080"
     environment:
       - KC_DB=postgres
